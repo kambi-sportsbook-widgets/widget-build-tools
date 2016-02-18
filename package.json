@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git"
   },
-  "devDependencies": {
+  "bundleDependencies": {
     "changelog": "latest",
     "del": "^2.0.2",
     "foreach": "^2.0.5",
