@@ -32,6 +32,8 @@
 
    replace = require('gulp-replace'),
 
+   install = require('gulp-install'),
+
    path = require('path'),
 
    gulpFile = require('gulp-file'),
@@ -40,13 +42,17 @@
 
    json_merger = require('json_merger'),
 
+   merge_stream = require('merge-stream'),
+
+   run_sequence = require('run-sequence'),
+
    buildTemp = '.buildTemp',
 
    compiledTemp = '.compiledTemp',
 
    npmLibs = [
-      './node_modules/kambi-sportsbook-widget-library/dist/js/app.min.js',
-      './node_modules/kambi-sportsbook-widget-core-translate/dist/translate.js'
+      'kambi-sportsbook-widget-library',
+      'kambi-sportsbook-widget-core-translate'
    ];
 
 
@@ -65,7 +71,35 @@
       logEntry(err, 'stacktrace   ');
    };
 
-   gulp.task('default', ['clean-build'], function () { });
+   gulp.task('default', ['clean-build']);
+
+
+   //cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
+   gulp.task('clean', function () {
+      del.sync(compiledTemp);
+      del.sync('.dist');
+      return del.sync(buildTemp);
+   });
+
+   //cleans then builds
+   gulp.task('clean-build', ['clean'], function () {
+      return gulp.start('build');
+   });
+
+   //runs pre-required tasks in order
+   gulp.task('build2', function (cb) {
+      return run_sequence(['npm-install', 'compile', 'js-concat'], cb);
+   });
+
+   //full build cycle with compilling and minifying
+   gulp.task('build', ['build2'], function() {
+      return gulp.src('./' + compiledTemp + '/src/index.html')
+         .pipe(htmlReplace({
+            css: 'css/app.min.css',
+            js: 'js/app.min.js'
+         }))
+         .pipe(gulp.dest('./dist'));
+   });
 
    gulp.task('publish', function () {
       var publisher = awspublish.create({
@@ -87,15 +121,19 @@
          .pipe(awspublish.reporter());
    });
 
+   gulp.task('npm-install', function () {
+      return gulp.src('package.json')
+         .pipe(install());
+   });
+
    //compiles all scss files and places them in compiledTemp folder
-   gulp.task('scss', [], function () {
+   gulp.task('compile-scss', [], function () {
       return sass('./src/scss/app.scss', {
             compass: true,
             style: 'expanded',
             lineComments: false,
             sourcemap: true
          })
-         .on('error', logError)
          .pipe(sourcemaps.write('.', {
             includeContent: false,
             sourceRoot: './src'
@@ -104,22 +142,30 @@
    });
 
    //compiles all js files using Babel and places them in compiledTemp folder
-   gulp.task('babel', [], function() {
+   gulp.task('compile-babel', [], function() {
       return gulp.src('./src/**/*.js')
-         .pipe(gulp.dest('./'+ compiledTemp +'/js'));
+         .pipe(gulp.dest('./'+ compiledTemp));
    });
 
    //copies all static files (.html, .json, images) to compiledTemp folder, i18n files are handled
    //by the translations task
    gulp.task('compile-static', [], function() {
       return gulp
-         .src(['./src/**/*', '!./src/**/*.js', '!./src/**/*.scss', '!./src/i18n/**'])
-         .pipe(gulp.dest('./'+ compiledTemp +'/js'));
+         .src([
+            './src/**/*',
+            '!./src/js/**',
+            '!./src/js/',
+            '!./src/scss/**',
+            '!./src/scss/',
+            '!./src/i18n/**',
+            '!./src/i18n/',
+         ])
+         .pipe(gulp.dest('./'+ compiledTemp));
    });
 
    //merges the i18n files from .src/i18n/ with kambi-sportsbook-widget-core-translate i18n files
    //and places them into compiledTemp/i18n/
-   gulp.task('translations', function () {
+   gulp.task('compile-translations', function () {
       return gulp.src('./src/i18n/*.json')
          .pipe(foreach(function ( stream, file ) {
             var name = path.basename(file.path);
@@ -133,14 +179,26 @@
          }));
    });
 
+   gulp.task('compile-npm-libraries', function() {
+      var streams = [];
+      // npmLibs.forEach(function(lib) {
+      //    streams.push(
+      //       gulp.src('./node_modules/' + lib + '/**')
+      //          .pipe(gulp.dest('./' + compiledTemp + '/node_modules/' + lib))
+      //    );
+      // });
+
+      return merge_stream.apply(this, streams);
+   });
+
    //compiles all js, scss and i18n files and place them (alongside static files) in the dist folder
-   gulp.task('compile', ['babel', 'scss', 'compile-static', 'translations']);
+   gulp.task('compile', ['compile-babel', 'compile-scss', 'compile-static', 'compile-translations', 'compile-npm-libraries']);
 
    //watches for any change in the files inside /src/ folder and recompiles them
    gulp.task('watch', [], function() {
-      gulp.watch('src/**/*.js', ['babel']);
-      gulp.watch('src/**/*.scss', ['scss']);
-      gulp.watch('src/i18n/*.json', ['translations']);
+      gulp.watch('src/**/*.js', ['compile-babel']);
+      gulp.watch('src/**/*.scss', ['compile-scss']);
+      gulp.watch('src/i18n/*.json', ['compile-translations']);
       gulp.watch(['./src/**/*', '!./src/**/*.js', '!./src/**/*.scss', '!./src/i18n/**'], ['compile-static']);
    });
 
@@ -154,25 +212,6 @@
          .pipe(gulp.dest('./dist/css'));
    });
 
-   //cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
-   gulp.task('clean', function () {
-      del.sync(compiledTemp);
-      del.sync('.dist');
-      return del.sync(buildTemp);
-   });
-
-   gulp.task('clean-build', ['clean'], function () {
-      return gulp.start('build');
-   });
-
-   gulp.task('build', ['js-concat', 'compile', 'translations'], function () {
-      return gulp.src('./' + compiledTemp + '/src/index.html')
-         .pipe(htmlReplace({
-            css: 'css/app.min.css',
-            js: 'js/app.min.js'
-         }))
-         .pipe(gulp.dest('./dist'));
-   });
 
    gulp.task('app-concat', function () {
       return gulp.src('./src/**/*.js')

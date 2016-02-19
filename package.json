@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "changelog": "latest",
+    "cli-color": "^1.0.0",
     "del": "^2.0.2",
     "foreach": "^2.0.5",
-    "cli-color": "^1.0.0",
     "gulp": "^3.9.0",
     "gulp-awspublish": "^3.0.1",
     "gulp-concat": "^2.6.0",
@@ -34,7 +34,8 @@
     "gulp-strip-debug": "^1.0.2",
     "gulp-uglify": "^1.4.2",
     "json_merger": "^1.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "run-sequence": "^1.1.5"
   },
   "license": "ISC",
   "bugs": {
