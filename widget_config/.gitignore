@@ -2,6 +2,7 @@
 node_modules
 .awspublish-*
 .buildTemp
+.compiledTemp
 .sass-cache/
 docs
 *.map
