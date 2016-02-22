@@ -62,12 +62,19 @@
     * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
     */
    gulp.task('copy-config-files', function() {
+      // .gitignore has special handling because npm does strips .gitignore files
+      // when downloading dependencies
       return gulp.src([
-            './node_modules/widget-build-tools/widget_config/.gitignore',
+            './node_modules/widget-build-tools/widget_config/gitignore',
             './node_modules/widget-build-tools/widget_config/.editorconfig',
             './node_modules/widget-build-tools/widget_config/.jshintrc',
             './node_modules/widget-build-tools/widget_config/config.rb',
          ])
+         .pipe(rename(function(path) {
+            if (path.basename === 'gitignore') {
+               path.basename = '.gitignore';
+            }
+         }))
          .pipe(gulp.dest('./'));
    });
 
