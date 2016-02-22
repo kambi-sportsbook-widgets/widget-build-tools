@@ -46,6 +46,8 @@
 
    run_sequence = require('run-sequence'),
 
+   babel = require('gulp-babel'),
+
    buildTemp = '.buildTemp',
 
    compiledTemp = '.compiledTemp',
@@ -56,8 +58,6 @@
    ];
 
 
-   gulp.task('default', ['clean-build']);
-
    //cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
    gulp.task('clean', function () {
       del.sync(compiledTemp);
@@ -65,12 +65,11 @@
       return del.sync(buildTemp);
    });
 
-   //cleans then builds
-   gulp.task('clean-build', ['clean'], function () {
+   gulp.task('default', ['clean'], function () {
       return gulp.start('build');
    });
 
-   //tasks used by 'build' to run everything in the right order
+   //tasks used by 'build' to run everything in the right order (npm-install -> compile -> css-concat & js-concat)
    gulp.task('build2', ['npm-install'], function() {
       gulp.start('build3');
    });
@@ -118,7 +117,7 @@
 
    //compiles all scss files and places them in {compiledTemp}/css/ folder
    gulp.task('compile-scss', [], function () {
-      return sass('./src/scss/app.scss', {
+      var scssStream = sass('./src/scss/app.scss', {
             compass: true,
             style: 'expanded',
             lineComments: false,
@@ -126,18 +125,37 @@
          })
          .pipe(sourcemaps.write('.', {
             includeContent: false,
-            sourceRoot: './src'
+            sourceRoot: '../css/src/scss'
          }))
          .pipe(gulp.dest('./'+ compiledTemp +'/css'));
+
+      var sourceStream = gulp.src('./src/**/*.scss')
+         .pipe(gulp.dest('./'+ compiledTemp +'/css/src/'));
+
+      return merge_stream(scssStream, sourceStream);
    });
 
    //compiles all js files using Babel and places them in {compiledTemp} folder
    gulp.task('compile-babel', [], function() {
-      return gulp.src('./src/**/*.js') //TODO add babel
+      var babelStream = gulp.src('./src/**/*.js')
          .pipe(jshint('.jshintrc'))
          .pipe(jshint.reporter('default'))
          .pipe(stripDebug())
-         .pipe(gulp.dest('./'+ compiledTemp));
+         /* TODO add babel when sourcemaps bug in chrome is fixed
+         */
+         .pipe(sourcemaps.init())
+         .pipe(babel({
+            presets: ['es2015'],
+            sourceRoot: '../src/'
+         }))
+         .pipe(concat('app.js'))
+         .pipe(sourcemaps.write('.'))
+         .pipe(gulp.dest('./'+ compiledTemp +'/js/'));
+
+      var sourceStream = gulp.src('./src/**/*.js')
+         .pipe(gulp.dest('./'+ compiledTemp +'/js/src/'));
+
+      return merge_stream(babelStream, sourceStream);
    });
 
    //copies all static files (.html, .json, images) to compiledTemp folder, i18n files are handled
