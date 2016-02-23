@@ -2,6 +2,8 @@
    'use strict';
    var gulp = require('gulp'),
 
+   fs = require('fs'),
+
    awspublish = require('gulp-awspublish'),
 
    rename = require('gulp-rename'),
@@ -50,12 +52,9 @@
 
    buildTemp = '.buildTemp',
 
-   compiledTemp = '.compiledTemp',
+   compiledTemp = '.compiledTemp';
 
-   npmLibs = [
-      './node_modules/kambi-sportsbook-widget-library/dist/js/app.min.js',
-      './node_modules/kambi-sportsbook-widget-core-translate/dist/translate.js'
-   ];
+   var buildVariables = JSON.parse(fs.readFileSync('./buildvariables.json'));
 
    /**
     * Copies project configuration files from the build tools into the project
@@ -103,18 +102,29 @@
    gulp.task('build3', ['compile'], function() {
       gulp.start('build4');
    });
-   gulp.task('build4', ['css-concat', 'js-concat']);
+   gulp.task('build4', ['html-replace', 'css-concat', 'js-concat']);
+
 
    /**
-    * full build cycle with compilling and minifying, then replaces references
-    * inside index.html to reference the minified and concatanated js and css files
+    * full build cycle with compilling and minifying
     */
-   gulp.task('build', ['build2'], function() {
-      return gulp.src('./' + compiledTemp + '/src/index.html')
-         .pipe(htmlReplace({
+   gulp.task('build', ['build2']);
+
+
+   /**
+    * replaces references inside index.html to reference the minified and concatanated
+    * js and css files
+    */
+   gulp.task('html-replace', function() {
+      var references = extendObj(
+         {
             css: 'css/app.min.css',
-            js: 'js/app.min.js'
-         }))
+            js: 'js/app.min.js',
+         },
+         buildVariables.htmlReplace
+      );
+      return gulp.src('./' + compiledTemp + '/index.html')
+         .pipe(htmlReplace(references))
          .pipe(gulp.dest('./dist'));
    });
 
@@ -129,7 +139,7 @@
 
       return gulp.src(['./dist/**/*'])
          .pipe(rename(function ( path ) {
-            path.dirname = '/tournament/' + path.dirname;
+            path.dirname = '/' + buildVariables.awsPublishPath + '/' + path.dirname;
          }))
          .pipe(publisher.publish(headers, {
             //force: true
@@ -255,15 +265,6 @@
    });
 
    /**
-    * creates a lib.js {buildTemp}/src folder that concatenates the npmLibs specified
-    */
-   gulp.task('npm-build', function () {
-      return gulp.src(npmLibs)
-         .pipe(concat('libs.js'))
-         .pipe(gulp.dest('./' + buildTemp + '/js'));
-   });
-
-   /**
     * concatanates all the js files in the compiledTemp folder into {buildTemp}/app.js
     */
    gulp.task('app-concat', function () {
@@ -275,7 +276,7 @@
    /**
     * concatanates and minifies all js files in {buildTemp} into /dist/js/app.min,js
     */
-   gulp.task('js-concat', ['app-concat', 'npm-build'], function () {
+   gulp.task('js-concat', ['app-concat'], function () {
       return gulp.src('./' + buildTemp + '/**/*.js')
          .pipe(concat('app.js'))
          .pipe(gulp.dest('./dist/js'))
