@@ -54,7 +54,7 @@
 
    compiledTemp = '.compiledTemp';
 
-   var buildVariables = JSON.parse(fs.readFileSync('./buildvariables.json'));
+   var buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json'));
 
    /**
     * Copies project configuration files from the build tools into the project
@@ -121,7 +121,7 @@
             css: 'css/app.min.css',
             js: 'js/app.min.js',
          },
-         buildVariables.htmlReplace
+         buildParameters.htmlReplace
       );
       return gulp.src('./' + compiledTemp + '/index.html')
          .pipe(htmlReplace(references))
@@ -139,7 +139,7 @@
 
       return gulp.src(['./dist/**/*'])
          .pipe(rename(function ( path ) {
-            path.dirname = '/' + buildVariables.awsPublishPath + '/' + path.dirname;
+            path.dirname = '/' + buildParameters.awsPublishPath + '/' + path.dirname;
          }))
          .pipe(publisher.publish(headers, {
             //force: true
