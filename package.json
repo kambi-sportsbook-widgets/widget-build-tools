@@ -44,5 +44,8 @@
   "bugs": {
     "url": "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
   },
-  "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme"
+  "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme",
+  "devDependencies": {
+    "gulp-jscs": "^3.0.2"
+  }
 }

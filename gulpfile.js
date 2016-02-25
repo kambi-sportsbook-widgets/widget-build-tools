@@ -50,6 +50,8 @@
 
    babel = require('gulp-babel'),
 
+   jscs = require('gulp-jscs'),
+
    buildTemp = '.buildTemp',
 
    compiledTemp = '.compiledTemp';
@@ -61,12 +63,13 @@
     * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
     */
    gulp.task('copy-config-files', function() {
-      // .gitignore has special handling because npm does strips .gitignore files
+      // .gitignore has special handling because npm strips .gitignore files
       // when downloading dependencies
       return gulp.src([
             './node_modules/widget-build-tools/widget_config/gitignore',
             './node_modules/widget-build-tools/widget_config/.editorconfig',
             './node_modules/widget-build-tools/widget_config/.jshintrc',
+            './node_modules/widget-build-tools/widget_config/.jscsrc',
             './node_modules/widget-build-tools/widget_config/config.rb',
          ])
          .pipe(rename(function(path) {
@@ -197,6 +200,8 @@
       return gulp.src('./src/**/*.js')
          .pipe(jshint('.jshintrc'))
          .pipe(jshint.reporter('default'))
+         .pipe(jscs())
+         .pipe(jscs.reporter())
          .pipe(stripDebug())
          .pipe(gulp.dest('./'+ compiledTemp));
    });
