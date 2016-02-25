@@ -38,14 +38,12 @@
     "json_merger": "^1.0.0",
     "merge-stream": "^1.0.0",
     "path": "^0.12.7",
-    "run-sequence": "^1.1.5"
+    "run-sequence": "^1.1.5",
+    "gulp-jscs": "^3.0.2"
   },
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
   },
-  "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme",
-  "devDependencies": {
-    "gulp-jscs": "^3.0.2"
-  }
+  "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme"
 }
