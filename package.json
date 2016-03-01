@@ -27,7 +27,9 @@
     "gulp-foreach": "^0.1.0",
     "gulp-html-replace": "^1.5.4",
     "gulp-install": "^0.6.0",
+    "gulp-jscs": "^3.0.2",
     "gulp-jshint": "^1.11.2",
+    "gulp-jsonminify": "^1.0.0",
     "gulp-notify": "^2.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-replace": "^0.5.4",
@@ -38,8 +40,7 @@
     "json_merger": "^1.0.0",
     "merge-stream": "^1.0.0",
     "path": "^0.12.7",
-    "run-sequence": "^1.1.5",
-    "gulp-jscs": "^3.0.2"
+    "run-sequence": "^1.1.5"
   },
   "license": "ISC",
   "bugs": {
