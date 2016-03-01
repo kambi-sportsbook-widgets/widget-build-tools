@@ -44,6 +44,8 @@
 
    json_merger = require('json_merger'),
 
+   jsonminify = require('gulp-jsonminify'),
+
    merge_stream = require('merge-stream'),
 
    run_sequence = require('run-sequence'),
@@ -228,7 +230,9 @@
             var coreJson = json_merger.fromFile(filePath);
             var result = extendObj(srcJson, coreJson);
             gulpFile(name, JSON.stringify(result), { src: true })
-               .pipe(gulp.dest(compiledTemp + '/i18n'));
+               .pipe(gulp.dest(compiledTemp + '/i18n'))
+               .pipe(jsonminify())
+               .pipe(gulp.dest('./dist/i18n/'));
             return stream;
          }));
    });
