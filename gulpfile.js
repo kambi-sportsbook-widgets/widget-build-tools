@@ -4,8 +4,6 @@
 
    fs = require('fs'),
 
-   awspublish = require('gulp-awspublish'),
-
    rename = require('gulp-rename'),
 
    concat = require('gulp-concat'),
