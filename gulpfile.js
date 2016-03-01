@@ -131,24 +131,6 @@
          .pipe(gulp.dest('./dist'));
    });
 
-   gulp.task('publish', ['build'], function () {
-      var publisher = awspublish.create({
-         params: {
-            Bucket: 'kambi-widgets'
-         }
-      });
-
-      var headers = {};
-
-      return gulp.src(['./dist/**/*'])
-         .pipe(rename(function (path) {
-            path.dirname = '/' + buildParameters.awsPublishPath + '/' + path.dirname;
-         }))
-         .pipe(publisher.publish(headers, {}))
-         .pipe(publisher.cache())
-         .pipe(awspublish.reporter());
-   });
-
    /**
     * Compiles all scss files and places them in {compiledTemp}/css/ folder
     */
