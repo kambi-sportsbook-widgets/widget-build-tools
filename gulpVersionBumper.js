@@ -72,28 +72,28 @@
    };
 
    gulp.task('version-bump-minor2', function () {
-      bumpVersion('minor');
+      return bumpVersion('minor');
    });
    gulp.task('version-bump-minor', ['version-bump-minor2'], function () {
       return gulp.start('version-bump-git-push');
    });
 
    gulp.task('version-bump-major2', function () {
-      bumpVersion('major');
+      return bumpVersion('major');
    });
    gulp.task('version-bump-major', ['version-bump-major2'], function () {
       return gulp.start('version-bump-git-push');
    });
 
    gulp.task('version-bump-patch2', function () {
-      bumpVersion('patch');
+      return bumpVersion('patch');
    });
    gulp.task('version-bump-patch', ['version-bump-patch2'], function () {
       return gulp.start('version-bump-git-push');
    });
 
    gulp.task('version-bump-prerelease2', function () {
-      bumpVersion('prerelease');
+      return bumpVersion('prerelease');
    });
    gulp.task('version-bump-patch', ['version-bump-prerelease2'], function () {
       return gulp.start('version-bump-git-push');
