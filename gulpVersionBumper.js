@@ -95,7 +95,7 @@
    gulp.task('version-bump-prerelease2', function () {
       return bumpVersion('prerelease');
    });
-   gulp.task('version-bump-patch', ['version-bump-prerelease2'], function () {
+   gulp.task('version-bump-prerelease', ['version-bump-prerelease2'], function () {
       return gulp.start('version-bump-git-push');
    });
 
