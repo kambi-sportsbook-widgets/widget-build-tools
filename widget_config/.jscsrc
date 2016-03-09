@@ -1,4 +1,5 @@
 {
+   "maxErrors": 200,
    "validateIndentation": 3,
    "disallowTabs": true,
    "validateQuoteMarks": true,
@@ -7,13 +8,13 @@
    "disallowTrailingComma": true,
    "disallowMultipleLineBreaks": true,
    "disallowMultipleSpaces": true,
-   "disallowSpacesInsideParentheses": true,
+   "disallowSpacesInsideParentheses": false,
    "requireSpacesInFunction": {
       "beforeOpeningRoundBrace": true,
       "beforeOpeningCurlyBrace": true
    },
    "requireSpaceBetweenArguments": true,
-   "requireCapitalizedComments": true,
+   "requireCapitalizedComments": false,
    "requireSpaceAfterLineComment": true,
    "requireSpaceBeforeBlockStatements": true,
    "requireSpaceBeforeBinaryOperators": true,
