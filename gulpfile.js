@@ -195,7 +195,8 @@
             '!./src/i18n/**',
             '!./src/i18n/'
          ])
-         .pipe(gulp.dest('./' + compiledTemp));
+         .pipe(gulp.dest('./' + compiledTemp))
+         .pipe(gulp.dest('./dist/'));
    });
 
    /**
