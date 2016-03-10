@@ -2,61 +2,64 @@
    'use strict';
    var gulp = require('gulp'),
 
-   fs = require('fs'),
+      fs = require('fs'),
 
-   rename = require('gulp-rename'),
+      rename = require('gulp-rename'),
 
-   concat = require('gulp-concat'),
+      concat = require('gulp-concat'),
 
-   uglify = require('gulp-uglify'),
+      uglify = require('gulp-uglify'),
 
-   color = require('cli-color'),
+      color = require('cli-color'),
 
-   rename = require('gulp-rename'),
+      notify = require('gulp-notify'),
 
-   notify = require('gulp-notify'),
+      jshint = require('gulp-jshint'),
 
-   jshint = require('gulp-jshint'),
+      stripDebug = require('gulp-strip-debug'),
 
-   stripDebug = require('gulp-strip-debug'),
+      sourcemaps = require('gulp-sourcemaps'),
 
-   sourcemaps = require('gulp-sourcemaps'),
+      sass = require('gulp-ruby-sass'),
 
-   sass = require('gulp-ruby-sass'),
+      cssnano = require('gulp-cssnano'),
 
-   cssnano = require('gulp-cssnano'),
+      htmlReplace = require('gulp-html-replace'),
 
-   htmlReplace = require('gulp-html-replace'),
+      del = require('del'),
 
-   del = require('del'),
+      replace = require('gulp-replace'),
 
-   replace = require('gulp-replace'),
+      install = require('gulp-install'),
 
-   install = require('gulp-install'),
+      path = require('path'),
 
-   path = require('path'),
+      gulpFile = require('gulp-file'),
 
-   gulpFile = require('gulp-file'),
+      foreach = require('gulp-foreach'),
 
-   foreach = require('gulp-foreach'),
+      json_merger = require('json_merger'),
 
-   json_merger = require('json_merger'),
+      jsonminify = require('gulp-jsonminify'),
 
-   jsonminify = require('gulp-jsonminify'),
+      merge_stream = require('merge-stream'),
 
-   merge_stream = require('merge-stream'),
+      run_sequence = require('run-sequence'),
 
-   run_sequence = require('run-sequence'),
+      babel = require('gulp-babel'),
 
-   babel = require('gulp-babel'),
+      jscs = require('gulp-jscs'),
 
-   jscs = require('gulp-jscs'),
+      buildTemp = '.buildTemp',
 
-   buildTemp = '.buildTemp',
-
-   compiledTemp = '.compiledTemp';
+      compiledTemp = '.compiledTemp';
 
    var buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json'));
+
+   var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/kambi-sportsbook-widget-library/package.json'));
+
+   var kambiWidgetAPIUrl = 'https://c3-static.kambi.com/sb-mobileclient/widget-api/{{API_VERSION}}/kambi-widget-api.js'
+      .replace('{{API_VERSION}}', coreLibConfig['kambi-widget-api-version']);
 
    /**
     * Copies project configuration files from the build tools into the project
@@ -72,8 +75,8 @@
             './node_modules/widget-build-tools/widget_config/.jscsrc',
             './node_modules/widget-build-tools/widget_config/config.rb'
          ])
-         .pipe(rename(function (path) {
-            if (path.basename === 'gitignore') {
+         .pipe(rename(function ( path ) {
+            if ( path.basename === 'gitignore' ) {
                path.basename = '.gitignore';
             }
          }))
@@ -120,7 +123,8 @@
       var references = extendObj(
          {
             css: 'css/app.min.css',
-            js: 'js/app.min.js'
+            js: 'js/app.min.js',
+            'kambi-widget-api': kambiWidgetAPIUrl
          },
          buildParameters.htmlReplace
       );
@@ -134,11 +138,11 @@
     */
    gulp.task('compile-scss', [], function () {
       var scssStream = sass('./src/scss/app.scss', {
-            compass: true,
-            style: 'expanded',
-            lineComments: false,
-            sourcemap: true
-         })
+         compass: true,
+         style: 'expanded',
+         lineComments: false,
+         sourcemap: true
+      })
          .pipe(sourcemaps.write('.', {
             includeContent: false,
             sourceRoot: '../css/src/scss'
@@ -195,8 +199,7 @@
             '!./src/i18n/**',
             '!./src/i18n/'
          ])
-         .pipe(gulp.dest('./' + compiledTemp))
-         .pipe(gulp.dest('./dist/'));
+         .pipe(gulp.dest('./' + compiledTemp));
    });
 
    /**
@@ -204,7 +207,7 @@
     */
    gulp.task('compile-translations', function () {
       return gulp.src('./src/i18n/*.json')
-         .pipe(foreach(function (stream, file) {
+         .pipe(foreach(function ( stream, file ) {
             var name = path.basename(file.path);
             var filePath = file.cwd + '/node_modules/kambi-sportsbook-widget-core-translate/dist/i18n/' + name;
             var srcJson = JSON.parse(file.contents.toString());
@@ -268,8 +271,10 @@
          .pipe(gulp.dest('./dist/js'));
    });
 
-   function extendObj (obj, src) {
-      Object.keys(src).forEach(function (key) { obj[key] = src[key]; });
+   function extendObj ( obj, src ) {
+      Object.keys(src).forEach(function ( key ) {
+         obj[key] = src[key];
+      });
       return obj;
    }
 
