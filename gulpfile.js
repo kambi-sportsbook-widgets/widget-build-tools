@@ -58,8 +58,10 @@
 
    var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/kambi-sportsbook-widget-library/package.json'));
 
+   var kambiAPIVersion = coreLibConfig['kambi-widget-api-version'] != null ? coreLibConfig['kambi-widget-api-version'] : '1.0.0.8';
+
    var kambiWidgetAPIUrl = 'https://c3-static.kambi.com/sb-mobileclient/widget-api/{{API_VERSION}}/kambi-widget-api.js'
-      .replace('{{API_VERSION}}', coreLibConfig['kambi-widget-api-version']);
+      .replace('{{API_VERSION}}', kambiAPIVersion);
 
    /**
     * Copies project configuration files from the build tools into the project
