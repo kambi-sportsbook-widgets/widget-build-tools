@@ -94,7 +94,7 @@
     * Cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
     */
    gulp.task('clean', ['clean-temp'], function () {
-      del.sync('.dist');
+      del.sync('dist');
    });
 
    /**
