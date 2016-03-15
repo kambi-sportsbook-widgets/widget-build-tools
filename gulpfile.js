@@ -85,13 +85,16 @@
          .pipe(gulp.dest('./'));
    });
 
+   gulp.task('clean-temp', function () {
+      del.sync(compiledTemp);
+      return del.sync(buildTemp);
+   });
+
    /**
     * Cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
     */
-   gulp.task('clean', function () {
-      del.sync(compiledTemp);
+   gulp.task('clean', ['clean-temp'], function () {
       del.sync('.dist');
-      return del.sync(buildTemp);
    });
 
    /**
