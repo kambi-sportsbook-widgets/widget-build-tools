@@ -1,5 +1,5 @@
 {
-   "predef": [ "rivets", "Stapes", "Promise", "CoreLibrary", "fetch" ],
+   "predef": [ "rivets", "Stapes", "Promise", "CoreLibrary", "fetch", "sightglass" ],
    "bitwise": true,
    "camelcase": false,
    "curly": true,
