@@ -60,6 +60,12 @@
       "MobileDetect": true,
       "FastClick": true,
       "FB": true,
-      "addToHomeScreen": true
+      "addToHomeScreen": true,
+      "rivets": true,
+      "Stapes": true,
+      "Promise": true,
+      "CoreLibrary": true,
+      "fetch": true,
+      "sightglass": true
    }
 }
