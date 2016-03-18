@@ -31,6 +31,34 @@ Replace the project gulpfile.js with:
 
 If the widget needs extra steps in its build lifecycle custom gulp tasks can be added at the end of the file, gulp tasks from the build tools can also be overridden there as well.
 
+## Configuration
+
+Create a file called buildparameters.json in the project directory.
+__`buildparameters.json`__
+```javascript
+{
+   "coreLibraryBaseUrl": "//kambi-cdn.globalmouth.com/lib/dist/", // Change this to the url of the build version of core library
+   "coreLibraryCSS": [ 
+      "css/app-base-all.css",
+      "css/widgets.css",
+      "css/app-icons.css"
+   ],
+   "coreLibraryJS": [
+      "js/app.min.js"
+   ],
+   "thirdPartyBaseUrl": "//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/",  // The location you want to load the third part libraries from
+   "thirdPartyLibs": [
+      "angular.min.js",
+      "angular-animate.min.js",
+      "angular-sanitize.min.js"
+   ],
+   "htmlReplace": {
+      "translate": "//kambi-cdn.globalmouth.com/translate/dist/translate.min.js" // If the widget requires the translate module, link it here
+   },
+   "awsPublishPath": "livenow"
+}
+```
+
 ## Important Gulp Tasks
 
   `gulp default`

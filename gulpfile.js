@@ -125,11 +125,35 @@
     * js and css files
     */
    gulp.task('html-replace', function () {
+
+      var thirdPartyLibs = [], coreLibraryCSS = [], coreLibraryJS = [], i;
+
+      if ( buildParameters.thirdPartyLibs != null ) {
+         for ( i = 0; i < buildParameters.thirdPartyLibs.length; i++ ) {
+            thirdPartyLibs.push(buildParameters.thirdPartyBaseUrl + buildParameters.thirdPartyLibs[i]);
+         }
+      }
+
+      if ( buildParameters.coreLibraryCSS != null ) {
+         for ( i = 0; i < buildParameters.coreLibraryCSS.length; i++ ) {
+            coreLibraryCSS.push(buildParameters.coreLibraryBaseUrl + buildParameters.coreLibraryCSS[i]);
+         }
+      }
+
+      if ( buildParameters.coreLibraryJS != null ) {
+         for ( i = 0; i < buildParameters.coreLibraryJS.length; i++ ) {
+            coreLibraryJS.push(buildParameters.coreLibraryBaseUrl + buildParameters.coreLibraryJS[i]);
+         }
+      }
+
       var references = extendObj(
          {
             css: 'css/app.min.css',
             js: 'js/app.min.js',
-            'kambi-widget-api': kambiWidgetAPIUrl
+            'kambi-widget-api': kambiWidgetAPIUrl,
+            coreLibraryCSS: coreLibraryCSS,
+            thirdPartyLibs: thirdPartyLibs,
+            corelib: coreLibraryJS
          },
          buildParameters.htmlReplace
       );
