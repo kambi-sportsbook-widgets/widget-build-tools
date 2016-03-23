@@ -1,10 +1,6 @@
 require 'compass/import-once/activate'
 # Require any additional compass plugins here.
 
-# import the core scss widget library
-add_import_path "./node_modules/kambi-sportsbook-widget-library/src/scss/"
-add_import_path "./node_modules/ionicons/scss/"
-
 # Set this to the root of your project when deployed:
 http_path = "/"
 css_dir = "src/css"
