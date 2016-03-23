@@ -140,7 +140,7 @@
          }
       }
 
-      var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/kambi-sportsbook-widget-library/package.json'));
+      var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/widget-core-library/package.json'));
 
       var kambiAPIVersion = coreLibConfig['kambi-widget-api-version'] != null ? coreLibConfig['kambi-widget-api-version'] : '1.0.0.8';
 
@@ -234,13 +234,13 @@
    });
 
    /**
-    * Merges the i18n files from ./src/i18n/ with kambi-sportsbook-widget-core-translate i18n files
+    * Merges the i18n files from ./src/i18n/ with widget-core-library i18n files
     */
    gulp.task('compile-translations', function () {
       return gulp.src('./src/i18n/*.json')
          .pipe(foreach(function ( stream, file ) {
             var name = path.basename(file.path);
-            var filePath = file.cwd + '/node_modules/kambi-sportsbook-widget-core-translate/dist/i18n/' + name;
+            var filePath = file.cwd + '/node_modules/widget-core-library/dist/i18n/' + name;
             var srcJson = JSON.parse(file.contents.toString());
             var coreJson = json_merger.fromFile(filePath);
             var result = extendObj(srcJson, coreJson);

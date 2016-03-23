@@ -1,6 +1,6 @@
 {
   "name": "widget-build-tools",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build tools shared between the widgets",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -43,7 +43,7 @@
     "path": "^0.12.7",
     "run-sequence": "^1.1.5"
   },
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
   },
