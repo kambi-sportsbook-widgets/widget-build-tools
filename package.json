@@ -42,7 +42,8 @@
       "json_merger": "^1.0.0",
       "merge-stream": "^1.0.0",
       "path": "^0.12.7",
-      "run-sequence": "^1.1.5"
+      "run-sequence": "^1.1.5",
+      "vinyl-fs": "^2.4.3"
    },
    "license": "MIT",
    "bugs": {

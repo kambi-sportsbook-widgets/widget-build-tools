@@ -50,6 +50,8 @@
 
       jscs = require('gulp-jscs'),
 
+      vinylfs = require('vinyl-fs'),
+
       download = require('gulp-download-stream'),
 
       supportLanguagesFiles = [],
@@ -91,11 +93,7 @@
          'tr_TR'
       ];
 
-   /**
-    * Copies project configuration files from the build tools into the project
-    * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
-    */
-   gulp.task('copy-config-files', function () {
+   var copyConfigFiles = function (overwrite) {
       // .gitignore has special handling because npm strips .gitignore files
       // when downloading dependencies
       return gulp.src([
@@ -111,7 +109,25 @@
                path.basename = '.gitignore';
             }
          }))
-         .pipe(gulp.dest('./'));
+         .pipe(vinylfs.dest('./', { overwrite: overwrite })); // same as gulp.dest, but accepts an overwrite flag
+   };
+
+   /**
+    * Copies project configuration files from the build tools into the project
+    * overwrites any present in the project
+    * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
+    */
+   gulp.task('force-copy-config-files', function () {
+      return copyConfigFiles(true);
+   });
+
+   /**
+    * Copies project configuration files from the build tools into the project
+    * if and only if they are not already there
+    * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
+    */
+   gulp.task('copy-config-files', function () {
+      return copyConfigFiles(false)
    });
 
    gulp.task('clean-temp', function () {

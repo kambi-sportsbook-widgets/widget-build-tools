@@ -9,3 +9,4 @@ docs
 bower_components
 /.project
 mockSetupData.json
+buildparameters.json
