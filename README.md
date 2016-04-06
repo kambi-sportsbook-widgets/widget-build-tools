@@ -38,7 +38,7 @@ __`buildparameters.json`__
 ```javascript
 {
    "coreLibraryBaseUrl": "//kambi-cdn.globalmouth.com/lib/dist/", // Change this to the url of the build version of core library
-   "coreLibraryCSS": [ 
+   "coreLibraryCSS": [
       "css/app-base-all.css",
       "css/widgets.css",
       "css/app-icons.css"
@@ -57,6 +57,20 @@ __`buildparameters.json`__
    },
    "awsPublishPath": "livenow"
 }
+```
+
+### To add specific locale strings to be compiled add the following to the buildparameters.json.
+Each array object must contain key/value pairs, where key is the Label of the string used in template, and the value
+represents the object pointing to Kambi locale.js
+
+```json
+"localeStrings": [
+      {
+         "Draw": "mostpopular.outcomeLabel.draw",
+         ...
+         ..
+      }
+   ]
 ```
 
 ## Important Gulp Tasks
