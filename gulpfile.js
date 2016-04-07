@@ -102,7 +102,8 @@
             './node_modules/widget-build-tools/widget_config/.jshintrc',
             './node_modules/widget-build-tools/widget_config/.jscsrc',
             './node_modules/widget-build-tools/widget_config/config.rb',
-            './node_modules/widget-build-tools/widget_config/LICENSE'
+            './node_modules/widget-build-tools/widget_config/LICENSE',
+            './node_modules/widget-build-tools/widget_config/.scss-lint.yml'
          ])
          .pipe(rename(function ( path ) {
             if ( path.basename === 'gitignore' ) {
