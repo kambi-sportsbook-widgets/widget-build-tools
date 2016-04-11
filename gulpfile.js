@@ -52,46 +52,13 @@
 
       vinylfs = require('vinyl-fs'),
 
-      download = require('gulp-download-stream'),
-
       supportLanguagesFiles = [],
 
       buildTemp = '.buildTemp',
 
       compiledTemp = '.compiledTemp';
 
-   var buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json')),
-      coreLibraryFolder = './node_modules/widget-core-library/src/i18n/',
-      supportLanguages = [
-         'cs_CZ',
-         'da_DK',
-         'de_AT',
-         'de_CH',
-         'de_DE',
-         'el_GR',
-         'en_AU',
-         'en_GB',
-         'es_ES',
-         'et_EE',
-         'fi_FI',
-         'fr_BE',
-         'fr_CH',
-         'fr_FR',
-         'hu_HU',
-         'it_IT',
-         'lt_LT',
-         'lv_LV',
-         'nl_BE',
-         'nl_NL',
-         'no_NO',
-         'pl_PL',
-         'pt_BR',
-         'pt_PT',
-         'ro_RO',
-         'ru_RU',
-         'sv_SE',
-         'tr_TR'
-      ];
+   var buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json'));
 
    var copyConfigFiles = function (overwrite) {
       // .gitignore has special handling because npm strips .gitignore files
@@ -128,7 +95,7 @@
     * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
     */
    gulp.task('copy-config-files', function () {
-      return copyConfigFiles(false)
+      return copyConfigFiles(false);
    });
 
    gulp.task('clean-temp', function () {
@@ -286,11 +253,6 @@
    });
 
    /**
-    * Merges the i18n files from ./src/i18n/ with widget-core-library i18n files
-    */
-   gulp.task('compile-translations', ['translations']);
-
-   /**
     * Compiles all js, scss and i18n files and place them (alongside static files) in the dist
     * folder
     */
@@ -341,79 +303,47 @@
    });
 
    /**
-    * Main translation task. Grabs existent locale files, minifies them and copies them in the dist folder
+    * Merges widget i18n files with cherry-picked strings from the widget-core-library
     */
-   gulp.task('translations', ['translations-merge'], function () {
-      del.sync('./dist/i18n/');
-      return gulp.src('./src/i18n/*.json')
-         .pipe(jsonminify())
-         .pipe(gulp.dest('./dist/i18n/'));
-   });
-
-   /**
-    * Fetches the locales into widget-core-library module. Deletes existing locales in the widget-core-library
-    */
-   gulp.task('translations-get-locales', function () {
-      supportLanguages.forEach(function ( locale ) {
-         supportLanguagesFiles.push({
-            file: locale + '.json',
-            url: 'https://publictest-static.kambi.com/sb-mobileclient/kambi/1.245.0.0//locale/' + locale + '/locale.js'
-         });
-      });
-      // Delete the src/i18n files
-      del.sync(coreLibraryFolder);
-      return download(supportLanguagesFiles)
-         .pipe(gulp.dest(coreLibraryFolder));
-   });
-
-   /**
-    * Prepares the json output
-    */
-   gulp.task('translations-to-json', function () {
-      return gulp.src('./node_modules/widget-core-library/src/i18n/*.json')
-         .pipe(replace('(function(require, define){\ndefine({', '{\n\t"LOCALE_IMPORT": "---",'))
-         .pipe(replace(');})(_kbc.require, _kbc.define);', ''))
-         .pipe(gulp.dest(coreLibraryFolder));
-   });
-
-   /**
-    * Cleans the source locales
-    */
-   gulp.task('translations-clear-src', function () {
-      return gulp.src('./src/i18n/*.json')
-         .pipe(replace(/(,||\s)+"LOCALE_IMPORT":(\s||.)"---"(\s||.)+/g, '\n}'))
-         .pipe(gulp.dest('./src/i18n/'));
-   });
-
-   /**
-    * Merges widget locales with cherry-picked strings from Kambi translation files
-    */
-   gulp.task('translations-merge', ['translations-clear-src', 'translations-to-json'], function () {
+   gulp.task('compile-translations', function () {
       return gulp.src('./src/i18n/*.json')
          .pipe(foreach(function ( stream, file ) {
             var name = path.basename(file.path);
-            var filePath = coreLibraryFolder + name;
+            var filePath = './src/i18n/' + name;
             var srcJson = JSON.parse(file.contents.toString());
             var selectedFromKambi = {};
-            fs.stat(filePath, function ( err ) {
-               if ( err == null ) {
-                  var localeJson = json_merger.fromFile(filePath);
 
-                  if ( buildParameters.localeStrings && buildParameters.localeStrings.length ) {
-                     buildParameters.localeStrings.forEach(function ( localeString ) {
-                        var key = Object.keys(localeString),
-                           path = localeString[key];
-                        /* Ignoring the error, not the best practice */
-                        /* jslint evil: true */
-                        selectedFromKambi[key[0]] = new Function('_', 'return _.' + path)(localeJson);
-                     });
-                  }
+            try {
+               fs.statSync(filePath); // throws error if file does not exist
+               var coreLibraryJson = json_merger.fromFile(filePath);
 
-                  var result = extendObj(srcJson, selectedFromKambi);
-                  gulpFile(name, JSON.stringify(result, null, 3), { src: true })
-                     .pipe(gulp.dest('./src/i18n/'));
+               // buildParameters.localeStrings should be an object in the following format:
+               // { "keyInI18nJSON": "pathToValueInKambiI18nJSON" }
+               if (buildParameters.localeStrings != null) {
+                  Object.keys(buildParameters.localeStrings).forEach(function ( key ) {
+                     // creates a new function that retrieves the string specified by the path in localeStrings from the localeJson
+                     /* jslint evil: true */
+                     selectedFromKambi[key] = new Function('json', 'return json.' + buildParameters.localeStrings[key])(coreLibraryJson);
+                  });
                }
-            });
+
+               var result = extendObj(srcJson, selectedFromKambi);
+               // TODO find a way to make this synchronous:
+               gulpFile(name, JSON.stringify(result, null, 3), { src: true })
+                  .pipe(gulp.dest('./' + compiledTemp + '/i18n/'))
+                  .pipe(jsonminify())
+                  .pipe(gulp.dest('./dist/i18n/'));
+            } catch (e) {
+               console.warn('Error while merging i18n file named: ' + name);
+               console.warn(e);
+               // TODO find a way to make this synchronous:
+               // copying without merging
+               gulp.src('./src/i18n/' + name + '.json')
+                  .pipe(gulp.dest('./' + compiledTemp + '/i18n/'))
+                  .pipe(jsonminify())
+                  .pipe(gulp.dest('./dist/i18n/'));
+            }
+
             return stream;
          }));
    });
