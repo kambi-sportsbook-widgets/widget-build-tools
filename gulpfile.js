@@ -53,7 +53,7 @@
          transpiled: transpileDir + '/js/',
          build: buildDir + '/js/',
          sourceRoot: '/js/',
-         coreLibrary: projectRoot + '/node_modules/widget-core-library/dist/js/'
+         coreLibrary: projectRoot + '/node_modules/widget-core-library/src/transpiled/js/'
       },
       css: {
          source: projectRoot + '/src/scss/',
@@ -66,6 +66,11 @@
          coreLibrarySource: projectRoot + '/node_modules/widget-core-library/src/i18n/',
          transpiled: transpileDir + '/i18n/',
          build: buildDir + '/i18n/',
+      },
+      fonts: {
+         source: projectRoot + '/node_modules/widget-core-library/src/fonts/**/*',
+         transpiled: transpileDir + '/fonts/',
+         build: buildDir + '/fonts/',
       },
       configFiles: [
          projectRoot + '/node_modules/widget-build-tools/widget_config/gitignore',
@@ -138,7 +143,10 @@
    gulp.task('build3', ['compile'], function () {
       return gulp.start('build4');
    });
-   gulp.task('build4', ['html-replace', 'bundle-static', 'bundle-css', 'bundle-js']);
+   gulp.task('build4', ['bundle-static', 'bundle-css', 'bundle-js', 'bundle-fonts'], function () {
+      return gulp.start('build5');
+   });
+   gulp.task('build5', ['html-replace']);
 
    /**
     * Full build cycle with compilling and minifying
@@ -222,19 +230,33 @@
    });
 
    /**
-    * Copies all static files (.html, .json, images) to transpiledDir folder, i18n files are handled
+    * Copies all static files (.html, .json, images) to transpileDir folder, i18n files are handled
     * by the compile-translations task
     */
    gulp.task('compile-static', [], function () {
       return gulp.src(paths.staticFiles)
-         .pipe(gulp.dest(buildDir));
+         .pipe(gulp.dest(transpileDir))
+   });
+
+   /**
+    * Copies all fonts from widget-core-library to transpileDir
+    */
+   gulp.task('compile-fonts', [], function () {
+      return gulp.src(paths.fonts.source)
+         .pipe(gulp.dest(paths.fonts.transpiled));
    });
 
    /**
     * Compiles all js, scss and i18n files and place them (alongside static files) in the dist
     * folder
     */
-   gulp.task('compile', ['compile-babel', 'compile-scss', 'compile-translations', 'compile-static']);
+   gulp.task('compile', [
+      'compile-babel',
+      'compile-scss',
+      'compile-translations',
+      'compile-static',
+      'compile-fonts'
+   ]);
 
    /**
     * Watches for any change in the files inside /src/ folder and recompiles them
@@ -244,6 +266,7 @@
       gulp.watch(paths.css.source + '/**/*.scss', ['compile-scss']);
       gulp.watch(paths.i18n.source + '/**/*.json', ['compile-translations']);
       gulp.watch(paths.staticFiles, ['compile-static']);
+      gulp.watch(paths.fonts.source, ['compile-fonts']);
    });
 
    /**
@@ -281,6 +304,14 @@
    gulp.task('bundle-static', [], function () {
       return gulp.src(paths.staticFiles)
          .pipe(gulp.dest(buildDir));
+   });
+
+   /**
+    * Copies all font files from widget-core-library to buildDir folder
+    */
+   gulp.task('bundle-fonts', [], function () {
+      return gulp.src(paths.fonts.source)
+         .pipe(gulp.dest(paths.fonts.build));
    });
 
    /**
