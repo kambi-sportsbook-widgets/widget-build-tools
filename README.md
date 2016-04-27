@@ -33,45 +33,22 @@ If the widget needs extra steps in its build lifecycle custom gulp tasks can be 
 
 ## Configuration
 
-Create a file called buildparameters.json in the project directory.
+To add specific locale strings create a file called buildparameters.json in the project directoryÂ
+
 __`buildparameters.json`__
 ```javascript
 {
-   "coreLibraryBaseUrl": "//kambi-cdn.globalmouth.com/lib/dist/", // Change this to the url of the build version of core library
-   "coreLibraryCSS": [
-      "css/app-base-all.css",
-      "css/widgets.css",
-      "css/app-icons.css"
-   ],
-   "coreLibraryJS": [
-      "js/app.min.js"
-   ],
-   "thirdPartyBaseUrl": "//ajax.googleapis.com/ajax/libs/angularjs/1.4.5/",  // The location you want to load the third part libraries from
-   "thirdPartyLibs": [
-      "angular.min.js",
-      "angular-animate.min.js",
-      "angular-sanitize.min.js"
-   ],
-   "htmlReplace": {
-      "translate": "//kambi-cdn.globalmouth.com/translate/dist/translate.min.js" // If the widget requires the translate module, link it here
-   },
-   "awsPublishPath": "livenow"
+   "localeStrings": [
+         {
+            "Draw": "mostpopular.outcomeLabel.draw",
+            ...
+         }
+      ]
 }
 ```
 
-### To add specific locale strings to be compiled add the following to the buildparameters.json.
-Each array object must contain key/value pairs, where key is the Label of the string used in template, and the value
-represents the object pointing to Kambi locale.js
+Each array object must contain key/value pairs, where key is the Label of the string used in template, and the value represents the object pointing to Kambi locale.js
 
-```json
-"localeStrings": [
-      {
-         "Draw": "mostpopular.outcomeLabel.draw",
-         ...
-         ..
-      }
-   ]
-```
 
 ## Important Gulp Tasks
 
@@ -93,4 +70,4 @@ represents the object pointing to Kambi locale.js
 
   `gulp version-bump-*`
 
-  Bumps the version of the project (in package.json), creates a tag and pushes those changes to origin. Valid values for * are: 'prerelease', 'patch', 'minor' and 'major'
+  Bumps the version of the project (in package.json), creates a tag and pushes those changes to origin:master. Valid values for * are: 'prerelease', 'patch', 'minor' and 'major'

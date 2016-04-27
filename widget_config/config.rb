@@ -6,7 +6,7 @@ add_import_path "./node_modules/widget-core-library/src/scss/"
 
 # Set this to the root of your project when deployed:
 http_path = "/"
-css_dir = "src/css"
+css_dir = "src/transpiled/css"
 sass_dir = "src/scss"
 images_dir = "images"
 javascripts_dir = "src/js"

@@ -1,12 +1,12 @@
 .idea
 node_modules
 .awspublish-*
-.buildTemp
-.compiledTemp
 .sass-cache/
 docs
 *.map
 bower_components
 /.project
 mockSetupData.json
-buildparameters.json
+/src/transpiled/
+/dist/
+/resourcepaths.json

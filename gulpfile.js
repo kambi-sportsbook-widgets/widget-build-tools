@@ -10,10 +10,6 @@
 
       uglify = require('gulp-uglify'),
 
-      color = require('cli-color'),
-
-      notify = require('gulp-notify'),
-
       jshint = require('gulp-jshint'),
 
       stripDebug = require('gulp-strip-debug'),
@@ -28,10 +24,6 @@
 
       del = require('del'),
 
-      replace = require('gulp-replace'),
-
-      install = require('gulp-install'),
-
       path = require('path'),
 
       gulpFile = require('gulp-file'),
@@ -42,72 +34,92 @@
 
       jsonminify = require('gulp-jsonminify'),
 
-      merge_stream = require('merge-stream'),
-
-      run_sequence = require('run-sequence'),
-
       babel = require('gulp-babel'),
 
       jscs = require('gulp-jscs'),
 
-      vinylfs = require('vinyl-fs'),
+      vinylfs = require('vinyl-fs');
 
-      supportLanguagesFiles = [],
+   var projectRoot = __dirname + '/../../';
 
-      buildTemp = '.buildTemp',
+   var transpileDir = projectRoot + '/src/transpiled/';
 
-      compiledTemp = '.compiledTemp';
+   var buildDir = projectRoot + '/dist/';
 
-   var buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json'));
+   // All file paths used in the gulp file are inside this object
+   var paths = {
+      js: {
+         source: projectRoot + '/src/js/',
+         transpiled: transpileDir + '/js/',
+         build: buildDir + '/js/',
+         sourceRoot: '/js/',
+         coreLibrary: projectRoot + '/node_modules/widget-core-library/dist/js/'
+      },
+      css: {
+         source: projectRoot + '/src/scss/',
+         transpiled: transpileDir + '/css/',
+         build: buildDir + '/css/',
+         sourceRoot: '../../scss/'
+      },
+      i18n: {
+         source: projectRoot + '/src/i18n/',
+         coreLibrarySource: projectRoot + '/node_modules/widget-core-library/src/i18n/',
+         transpiled: transpileDir + '/i18n/',
+         build: buildDir + '/i18n/',
+      },
+      configFiles: [
+         projectRoot + '/node_modules/widget-build-tools/widget_config/gitignore',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/.editorconfig',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/.jshintrc',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/.jscsrc',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/config.rb',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/LICENSE',
+         projectRoot + '/node_modules/widget-build-tools/widget_config/.scss-lint.yml'
+      ],
+      staticFiles: [
+         './src/**/*',
+         '!./src/js/**',
+         '!./src/js/',
+         '!./src/scss/**',
+         '!./src/scss/',
+         '!./src/i18n/**',
+         '!./src/i18n/',
+         '!./src/transpiled/**',
+         '!./src/transpiled/'
+      ]
+   };
 
-   var copyConfigFiles = function (overwrite) {
-      // .gitignore has special handling because npm strips .gitignore files
-      // when downloading dependencies
-      return gulp.src([
-            './node_modules/widget-build-tools/widget_config/gitignore',
-            './node_modules/widget-build-tools/widget_config/.editorconfig',
-            './node_modules/widget-build-tools/widget_config/.jshintrc',
-            './node_modules/widget-build-tools/widget_config/.jscsrc',
-            './node_modules/widget-build-tools/widget_config/config.rb',
-            './node_modules/widget-build-tools/widget_config/LICENSE',
-            './node_modules/widget-build-tools/widget_config/.scss-lint.yml'
-         ])
+   var buildParameters;
+   try {
+      buildParameters = JSON.parse(fs.readFileSync('./buildparameters.json'));
+   } catch (e) {
+      buildParameters = {};
+   }
+
+   /**
+    * Copies project configuration files from the build tools into the project
+    */
+   gulp.task('copy-config-files', function () {
+      return gulp.src(paths.configFiles)
          .pipe(rename(function ( path ) {
+            // .gitignore has special handling because npm strips .gitignore files
+            // when downloading dependencies
             if ( path.basename === 'gitignore' ) {
                path.basename = '.gitignore';
             }
          }))
-         .pipe(vinylfs.dest('./', { overwrite: overwrite })); // same as gulp.dest, but accepts an overwrite flag
-   };
-
-   /**
-    * Copies project configuration files from the build tools into the project
-    * overwrites any present in the project
-    * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
-    */
-   gulp.task('force-copy-config-files', function () {
-      return copyConfigFiles(true);
-   });
-
-   /**
-    * Copies project configuration files from the build tools into the project
-    * if and only if they are not already there
-    * The files are: .gitignore, .jshintrc, .editorconfig, config.rb
-    */
-   gulp.task('copy-config-files', function () {
-      return copyConfigFiles(false);
+         .pipe(vinylfs.dest(projectRoot, { overwrite: true })); // same as gulp.dest, but accepts an overwrite flag
    });
 
    gulp.task('clean-temp', function () {
-      del.sync(compiledTemp);
-      return del.sync(buildTemp);
+      return del.sync(transpileDir);
    });
 
    /**
-    * Cleans the project (deletes compiledTemp, /dist/ and buildTemp folders)
+    * Cleans the project (deletes transpileDir and buildDir folders)
     */
    gulp.task('clean', ['clean-temp'], function () {
-      del.sync('dist');
+      return del.sync(buildDir);
    });
 
    /**
@@ -121,12 +133,12 @@
     * Tasks used by 'build' to run everything in the right order
     */
    gulp.task('build2', ['copy-config-files'], function () {
-      gulp.start('build3');
+      return gulp.start('build3');
    });
    gulp.task('build3', ['compile'], function () {
-      gulp.start('build4');
+      return gulp.start('build4');
    });
-   gulp.task('build4', ['html-replace', 'css-concat', 'js-concat']);
+   gulp.task('build4', ['html-replace', 'bundle-static', 'bundle-css', 'bundle-js']);
 
    /**
     * Full build cycle with compilling and minifying
@@ -138,178 +150,147 @@
     * js and css files
     */
    gulp.task('html-replace', function () {
-
-      var thirdPartyLibs = [], coreLibraryCSS = [], coreLibraryJS = [], i;
-
-      if ( buildParameters.thirdPartyLibs != null ) {
-         for ( i = 0; i < buildParameters.thirdPartyLibs.length; i++ ) {
-            thirdPartyLibs.push(buildParameters.thirdPartyBaseUrl + buildParameters.thirdPartyLibs[i]);
-         }
+      var resourcePaths;
+      try {
+         resourcePaths = JSON.parse(fs.readFileSync('./resourcepaths.json'));
+      } catch (e) {
+         throw new Error('could not read resourcepaths.json');
       }
-
-      if ( buildParameters.coreLibraryCSS != null ) {
-         for ( i = 0; i < buildParameters.coreLibraryCSS.length; i++ ) {
-            coreLibraryCSS.push(buildParameters.coreLibraryBaseUrl + buildParameters.coreLibraryCSS[i]);
-         }
-      }
-
-      if ( buildParameters.coreLibraryJS != null ) {
-         for ( i = 0; i < buildParameters.coreLibraryJS.length; i++ ) {
-            coreLibraryJS.push(buildParameters.coreLibraryBaseUrl + buildParameters.coreLibraryJS[i]);
-         }
+      if (resourcePaths.htmlReplace == null) {
+         resourcePaths.htmlReplace = {};
       }
 
       var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/widget-core-library/package.json'));
 
-      var kambiAPIVersion = coreLibConfig['kambi-widget-api-version'] != null ? coreLibConfig['kambi-widget-api-version'] : '1.0.0.8';
+      var kambiAPIVersion = coreLibConfig['kambi-widget-api-version'] != null ? coreLibConfig['kambi-widget-api-version'] : '1.0.0.10';
 
       var kambiWidgetAPIUrl = 'https://c3-static.kambi.com/sb-mobileclient/widget-api/{{API_VERSION}}/kambi-widget-api.js'
          .replace('{{API_VERSION}}', kambiAPIVersion);
 
       var references = extendObj(
          {
-            css: 'css/app.min.css',
             js: 'js/app.min.js',
+            css: 'css/app.min.css',
             'kambi-widget-api': kambiWidgetAPIUrl,
-            coreLibraryCSS: coreLibraryCSS,
-            thirdPartyLibs: thirdPartyLibs,
-            corelib: coreLibraryJS
+            'third-party-libs': resourcePaths.thirdPartyLibs
          },
-         buildParameters.htmlReplace
+         resourcePaths.htmlReplace
       );
-      return gulp.src('./' + compiledTemp + '/index.html')
+      return gulp.src('./src/index.html')
          .pipe(htmlReplace(references))
          .pipe(gulp.dest('./dist'));
    });
 
    /**
-    * Compiles all scss files and places them in {compiledTemp}/css/ folder
+    * Compiles all scss files and places them in {transpileDir}/css/ folder
     */
    gulp.task('compile-scss', [], function () {
-      var scssStream = sass('./src/scss/app.scss', {
-         compass: true,
-         style: 'expanded',
-         lineComments: false,
-         sourcemap: true
-      })
+      return sass(paths.css.source + 'app.scss', {
+            compass: true,
+            style: 'expanded',
+            lineComments: false,
+            sourcemap: true
+         })
          .pipe(sourcemaps.write('.', {
             includeContent: false,
-            sourceRoot: '../css/src/scss'
+            sourceRoot: paths.css.sourceRoot
          }))
-         .pipe(gulp.dest('./' + compiledTemp + '/css'));
-
-      var sourceStream = gulp.src('./src/**/*.scss')
-         .pipe(gulp.dest('./' + compiledTemp + '/css/src/'));
-
-      return merge_stream(scssStream, sourceStream);
+         .pipe(gulp.dest(paths.css.transpiled));
    });
 
    /**
-    * Compiles all js files using Babel and places them in {compiledTemp} folder
+    * Compiles all js files using Babel and places them in {transpileDir} folder
     */
    gulp.task('compile-babel', [], function () {
-      // TODO add babel compilation step once chrome sourcemap bug gets fixed
-      // https://bugs.chromium.org/p/chromium/issues/detail?id=369797
-      // var babelStream = gulp.src('./src/**/*.js')
-      //    .pipe(jshint('.jshintrc'))
-      //    .pipe(jshint.reporter('default'))
-      //    .pipe(sourcemaps.init())
-      //    .pipe(babel({
-      //       presets: ['es2015'],
-      //       sourceRoot: '../src/'
-      //    }))
-      //    .pipe(concat('app.js'))
-      //    .pipe(sourcemaps.write('.'))
-      //    .pipe(gulp.dest('./'+ compiledTemp +'/js/'));
-      // var sourceStream = gulp.src('./src/**/*.js')
-      //    .pipe(gulp.dest('./'+ compiledTemp +'/js/src/'));
-      // return merge_stream(babelStream, sourceStream);
-
-      return gulp.src('./src/**/*.js')
+      var sourceRootMap = function (file) {
+         return '../' + path.relative(file.history[0], paths.js.source) + paths.js.sourceRoot;
+      }
+      return gulp.src(paths.js.source + '/**/*.js')
          .pipe(jshint('.jshintrc'))
          .pipe(jshint.reporter('default'))
          .pipe(jscs())
          .pipe(jscs.reporter())
-         .pipe(gulp.dest('./' + compiledTemp));
+         .pipe(sourcemaps.init())
+         .pipe(babel({
+            presets: ['es2015']
+         }))
+         .pipe(sourcemaps.write('.', {
+            includeContent: false,
+            sourceRoot: sourceRootMap
+         }))
+         .pipe(gulp.dest(paths.js.transpiled));
    });
 
    /**
-    * Copies all static files (.html, .json, images) to compiledTemp folder, i18n files are handled
-    * by the translations task
+    * Copies all static files (.html, .json, images) to transpiledDir folder, i18n files are handled
+    * by the compile-translations task
     */
    gulp.task('compile-static', [], function () {
-      return gulp
-         .src([
-            './src/**/*',
-            '!./src/js/**',
-            '!./src/js/',
-            '!./src/scss/**',
-            '!./src/scss/',
-            '!./src/i18n/**',
-            '!./src/i18n/'
-         ])
-         .pipe(gulp.dest('./' + compiledTemp))
-         .pipe(gulp.dest('./dist/'));
+      return gulp.src(paths.staticFiles)
+         .pipe(gulp.dest(buildDir));
    });
 
    /**
     * Compiles all js, scss and i18n files and place them (alongside static files) in the dist
     * folder
     */
-   gulp.task('compile', ['compile-babel', 'compile-scss', 'compile-static', 'compile-translations']);
+   gulp.task('compile', ['compile-babel', 'compile-scss', 'compile-translations', 'compile-static']);
 
    /**
     * Watches for any change in the files inside /src/ folder and recompiles them
     */
    gulp.task('watch', [], function () {
-      gulp.watch('src/**/*.js', ['compile-babel']);
-      gulp.watch('src/**/*.scss', ['compile-scss']);
-      gulp.watch('src/i18n/*.json', ['compile-translations']);
-      gulp.watch(['./src/**/*', '!./src/**/*.js', '!./src/**/*.scss', '!./src/i18n/**'], ['compile-static']);
+      gulp.watch(paths.js.source + '/**/*.js', ['compile-babel']);
+      gulp.watch(paths.css.source + '/**/*.scss', ['compile-scss']);
+      gulp.watch(paths.i18n.source + '/**/*.json', ['compile-translations']);
+      gulp.watch(paths.staticFiles, ['compile-static']);
    });
 
    /**
-    * Minifies and concatenates all css files from {compiledTemp} and places them in the dist folder
+    * Minifies and concatenates all css files from {transpileDir} into {buildDir}
     */
-   gulp.task('css-concat', function () {
-      return gulp.src('./' + compiledTemp + '/css/**/*.css')
+   gulp.task('bundle-css', function () {
+      return gulp.src(paths.css.transpiled + '/**/*.css')
          .pipe(concat('app.css'))
-         .pipe(gulp.dest('./dist/css'))
+         .pipe(gulp.dest(paths.css.build))
          .pipe(cssnano())
          .pipe(rename('app.min.css'))
-         .pipe(gulp.dest('./dist/css'));
+         .pipe(gulp.dest(paths.css.build));
    });
 
    /**
-    * Concatanates all the js files in the compiledTemp folder into {buildTemp}/app.js
+    * Minifies and concatenates all js files from {transpileDir} into {buildDir}
     */
-   gulp.task('app-concat', function () {
-      return gulp.src('./' + compiledTemp + '/**/*.js')
-         .pipe(concat('app.js'))
-         .pipe(gulp.dest('./' + buildTemp + '/js'));
-   });
-
-   /**
-    * Concatanates and minifies all js files in {buildTemp} into /dist/js/app.min,js
-    */
-   gulp.task('js-concat', ['app-concat'], function () {
-      return gulp.src('./' + buildTemp + '/**/*.js')
+   gulp.task('bundle-js', function () {
+      return gulp.src([
+            paths.js.coreLibrary + '**/*.js',
+            paths.js.transpiled + '**/*.js'
+         ])
          .pipe(concat('app.js'))
          .pipe(stripDebug())
-         .pipe(gulp.dest('./dist/js'))
+         .pipe(gulp.dest(paths.js.build))
          .pipe(uglify())
          .pipe(rename('app.min.js'))
-         .pipe(gulp.dest('./dist/js'));
+         .pipe(gulp.dest(paths.js.build));
+   });
+
+   /**
+    * Copies all static files (.html, .json, images) to buildDir folder, i18n files are handled
+    * by the compile-translations task
+    */
+   gulp.task('bundle-static', [], function () {
+      return gulp.src(paths.staticFiles)
+         .pipe(gulp.dest(buildDir));
    });
 
    /**
     * Merges widget i18n files with cherry-picked strings from the widget-core-library
     */
    gulp.task('compile-translations', function () {
-      return gulp.src('./src/i18n/*.json')
+      return gulp.src(paths.i18n.source + '/**/*.json')
          .pipe(foreach(function ( stream, file ) {
             var name = path.basename(file.path);
-            var filePath = './src/i18n/' + name;
+            var filePath = paths.i18n.coreLibrarySource + name;
             var srcJson = JSON.parse(file.contents.toString());
             var selectedFromKambi = {};
 
@@ -330,18 +311,18 @@
                var result = extendObj(srcJson, selectedFromKambi);
                // TODO find a way to make this synchronous:
                gulpFile(name, JSON.stringify(result, null, 3), { src: true })
-                  .pipe(gulp.dest('./' + compiledTemp + '/i18n/'))
+                  .pipe(gulp.dest(paths.i18n.transpiled))
                   .pipe(jsonminify())
-                  .pipe(gulp.dest('./dist/i18n/'));
+                  .pipe(gulp.dest(paths.i18n.build));
             } catch (e) {
-               console.warn('Error while merging i18n file named: ' + name);
+               console.warn('Warning: could not merge i18n file named: ' + name + ' with core file');
                console.warn(e);
                // TODO find a way to make this synchronous:
                // copying without merging
-               gulp.src('./src/i18n/' + name + '.json')
-                  .pipe(gulp.dest('./' + compiledTemp + '/i18n/'))
+               gulp.src(paths.i18n.source + name + '.json')
+                  .pipe(gulp.dest('./' + transpileDir + '/i18n/'))
                   .pipe(jsonminify())
-                  .pipe(gulp.dest('./dist/i18n/'));
+                  .pipe(gulp.dest(paths.i18n.source.build));
             }
 
             return stream;
