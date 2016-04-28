@@ -350,7 +350,7 @@
                console.warn(e);
                // TODO find a way to make this synchronous:
                // copying without merging
-               gulp.src(paths.i18n.source + name + '.json')
+               gulp.src(paths.i18n.source + name)
                   .pipe(gulp.dest('./' + transpileDir + '/i18n/'))
                   .pipe(jsonminify())
                   .pipe(gulp.dest(paths.i18n.source.build));
