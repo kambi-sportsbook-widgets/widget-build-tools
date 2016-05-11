@@ -53,7 +53,7 @@
          transpiled: transpileDir + '/js/',
          build: buildDir + '/js/',
          sourceRoot: '/js/',
-         coreLibrary: projectRoot + '/node_modules/widget-core-library/src/transpiled/js/'
+         coreLibraryFile: projectRoot + '/node_modules/widget-core-library/dist/core.js'
       },
       css: {
          source: projectRoot + '/src/scss/',
@@ -65,12 +65,12 @@
          source: projectRoot + '/src/i18n/',
          coreLibrarySource: projectRoot + '/node_modules/widget-core-library/src/i18n/',
          transpiled: transpileDir + '/i18n/',
-         build: buildDir + '/i18n/',
+         build: buildDir + '/i18n/'
       },
       fonts: {
          source: projectRoot + '/node_modules/widget-core-library/src/fonts/**/*',
          transpiled: transpileDir + '/fonts/',
-         build: buildDir + '/fonts/',
+         build: buildDir + '/fonts/'
       },
       configFiles: [
          projectRoot + '/node_modules/widget-build-tools/widget_config/gitignore',
@@ -212,7 +212,7 @@
    gulp.task('compile-babel', [], function () {
       var sourceRootMap = function (file) {
          return '../' + path.relative(file.history[0], paths.js.source) + paths.js.sourceRoot;
-      }
+      };
       return gulp.src(paths.js.source + '/**/*.js')
          .pipe(jshint('.jshintrc'))
          .pipe(jshint.reporter('default'))
@@ -235,7 +235,7 @@
     */
    gulp.task('compile-static', [], function () {
       return gulp.src(paths.staticFiles)
-         .pipe(gulp.dest(transpileDir))
+         .pipe(gulp.dest(transpileDir));
    });
 
    /**
@@ -286,7 +286,7 @@
     */
    gulp.task('bundle-js', function () {
       return gulp.src([
-            paths.js.coreLibrary + '**/*.js',
+            paths.js.coreLibraryFile,
             paths.js.transpiled + '**/*.js'
          ])
          .pipe(concat('app.js'))
