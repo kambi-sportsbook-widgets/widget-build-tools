@@ -15,7 +15,6 @@
    "maxerr": false,
    "maxlen": 160,
    "maxparams": 10,
-   "maxstatements": 40,
    "newcap": true,
    "noarg": true,
    "noempty": true,
