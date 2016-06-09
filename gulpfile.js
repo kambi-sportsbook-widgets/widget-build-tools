@@ -276,7 +276,9 @@
       return gulp.src(paths.css.transpiled + '/**/*.css')
          .pipe(concat('app.css'))
          .pipe(gulp.dest(paths.css.build))
-         .pipe(cssnano())
+         .pipe(cssnano({
+            autoprefixer: false // If true removes older browser prefixes from code
+         }))
          .pipe(rename('app.min.css'))
          .pipe(gulp.dest(paths.css.build));
    });
