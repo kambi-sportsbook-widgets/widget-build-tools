@@ -101,6 +101,44 @@
       buildParameters = {};
    }
 
+   var coreLibConfig, widgetConfig, buildToolsConfig, dependencyCoreLibVersion, dependencyBuildToolsVersion;
+   try {
+      coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/widget-core-library/package.json'));
+      widgetConfig = JSON.parse(fs.readFileSync('./package.json'));
+
+      buildToolsConfig = JSON.parse(fs.readFileSync('./node_modules/widget-build-tools/package.json'));
+
+      dependencyBuildToolsVersion = widgetConfig.devDependencies['widget-build-tools'].split('#')[1];
+      if (dependencyBuildToolsVersion.charAt(0) === 'v') {
+         dependencyBuildToolsVersion = dependencyBuildToolsVersion.slice(1);
+      }
+
+      dependencyCoreLibVersion = widgetConfig.devDependencies['widget-core-library'].split('#')[1];
+      if (dependencyCoreLibVersion.charAt(0) === 'v') {
+         dependencyCoreLibVersion = dependencyCoreLibVersion.slice(1);
+      }
+   } catch (e) {
+      throw new Error('Could not read package.json of the widget or one of its dependencies');
+   }
+
+   if (dependencyCoreLibVersion !== coreLibConfig.version) {
+      throw new Error(
+         'widget-core-library dependency does not match node_modules dependency version. Expected: ' +
+         dependencyCoreLibVersion +
+         ' got ' +
+         coreLibConfig.version +
+         ' \nPlease run npm install (not npm update!)');
+   }
+
+   if (dependencyBuildToolsVersion !== buildToolsConfig.version) {
+      throw new Error(
+         'widget-build-tools dependency does not match node_modules dependency version. Expected: ' +
+         dependencyBuildToolsVersion +
+         ' got ' +
+         buildToolsConfig.version +
+         ' \nPlease run npm install (not npm update!)');
+   }
+
    /**
     * Copies project configuration files from the build tools into the project
     */
@@ -167,8 +205,6 @@
       if (resourcePaths.htmlReplace == null) {
          resourcePaths.htmlReplace = {};
       }
-
-      var coreLibConfig = JSON.parse(fs.readFileSync('./node_modules/widget-core-library/package.json'));
 
       var kambiAPIVersion = coreLibConfig['kambi-widget-api-version'] != null ? coreLibConfig['kambi-widget-api-version'] : '1.0.0.10';
 
