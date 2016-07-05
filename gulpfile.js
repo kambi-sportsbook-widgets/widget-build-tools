@@ -12,6 +12,8 @@
 
       jshint = require('gulp-jshint'),
 
+      insert = require('gulp-insert'),
+
       stripDebug = require('gulp-strip-debug'),
 
       sourcemaps = require('gulp-sourcemaps'),
@@ -66,6 +68,10 @@
          coreLibrarySource: projectRoot + '/node_modules/widget-core-library/src/i18n/',
          transpiled: transpileDir + '/i18n/',
          build: buildDir + '/i18n/'
+      },
+      views: {
+         source: projectRoot + '/src/views/*.html',
+         transpiled: transpileDir + '/js/views/'
       },
       fonts: {
          source: projectRoot + '/node_modules/widget-core-library/src/fonts/**/*',
@@ -275,6 +281,29 @@
    });
 
    /**
+    * Transforms all .html files from /src/views into javascript files
+    * that add the content of the original files as strings in global
+    * names defined by the original file name
+    */
+   gulp.task('compile-views', [], function () {
+      return gulp.src(paths.views.source)
+         .pipe(foreach(function ( stream, file ) {
+            var name = path.basename(file.path);
+            name = name.slice(0, -5);
+            return stream
+               .pipe(insert.prepend('window["' + name + '-view' + '"] = `'))
+               .pipe(insert.append('`;'));
+         }))
+         .pipe(rename(function (path) {
+            path.extname = '.js';
+         }))
+         .pipe(babel({ // babel does the scaping of the file convertin `` to ""
+            presets: ['es2015']
+         }))
+         .pipe(gulp.dest(paths.views.transpiled));
+   });
+
+   /**
     * Copies all fonts from widget-core-library to transpileDir
     */
    gulp.task('compile-fonts', [], function () {
@@ -291,6 +320,7 @@
       'compile-scss',
       'compile-translations',
       'compile-static',
+      'compile-views',
       'compile-fonts'
    ]);
 
@@ -302,6 +332,7 @@
       gulp.watch(paths.css.source + '/**/*.scss', ['compile-scss']);
       gulp.watch(paths.i18n.source + '/**/*.json', ['compile-translations']);
       gulp.watch(paths.staticFiles, ['compile-static']);
+      gulp.watch(paths.views.source, ['compile-views']);
       gulp.watch(paths.fonts.source, ['compile-fonts']);
    });
 
