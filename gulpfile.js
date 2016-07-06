@@ -58,7 +58,7 @@
          build: buildDir + '/js/',
          sourceRoot: '/js/',
          coreLibraryFile: projectRoot + '/node_modules/widget-core-library/dist/core.js',
-         thirdPartyLibraryFile: projectRoot + '/node_modules/widget-build-tools/node_modules/third-party-dependencies/dist/thirdparty.js',
+         thirdPartyLibraryFile: projectRoot + '/node_modules/third-party-dependencies/dist/thirdparty.js',
       },
       css: {
          source: projectRoot + '/src/scss/',
@@ -234,7 +234,7 @@
          css: 'css/app.min.css',
          'kambi-widget-api': kambiWidgetAPIUrl
       };
-      if (bundleThirdPartyLibraries) {
+      if (!bundleThirdPartyLibraries) {
          references['third-party-libs'] = resourcePaths.thirdPartyLibs;
       }
 
