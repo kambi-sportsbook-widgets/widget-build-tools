@@ -229,13 +229,17 @@
       var kambiWidgetAPIUrl = 'https://c3-static.kambi.com/sb-mobileclient/widget-api/{{API_VERSION}}/kambi-widget-api.js'
          .replace('{{API_VERSION}}', kambiAPIVersion);
 
-      var references = extendObj(
-         {
-            js: 'js/app.min.js',
-            css: 'css/app.min.css',
-            'kambi-widget-api': kambiWidgetAPIUrl,
-            'third-party-libs': bundleThirdPartyLibraries ? undefined : resourcePaths.thirdPartyLibs
-         },
+      var references = {
+         js: 'js/app.min.js',
+         css: 'css/app.min.css',
+         'kambi-widget-api': kambiWidgetAPIUrl
+      };
+      if (bundleThirdPartyLibraries) {
+         references['third-party-libs'] = resourcePaths.thirdPartyLibs;
+      }
+
+      references = extendObj(
+         references,
          resourcePaths.htmlReplace
       );
       return gulp.src('./src/index.html')
@@ -366,11 +370,17 @@
     * Minifies and concatenates all js files from {transpileDir} into {buildDir}
     */
    gulp.task('bundle-js', function () {
-      return gulp.src([
-            paths.js.thirdPartyLibraryFile,
-            paths.js.coreLibraryFile,
-            paths.js.transpiled + '**/*.js'
-         ])
+      var files = [
+         paths.js.coreLibraryFile,
+         paths.js.transpiled + '**/*.js'
+      ];
+      if (bundleThirdPartyLibraries) {
+         files = [paths.js.thirdPartyLibraryFile].concat(files);
+      }
+      fs.exists(paths.js.thirdPartyLibraryFile, function (e) {
+         console.log(e);
+      });
+      return gulp.src(files)
          .pipe(concat('app.js'))
          .pipe(stripDebug())
          .pipe(gulp.dest(paths.js.build))
