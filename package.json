@@ -43,7 +43,8 @@
     "merge-stream": "^1.0.0",
     "path": "^0.12.7",
     "run-sequence": "^1.1.5",
-    "vinyl-fs": "^2.4.3"
+    "vinyl-fs": "^2.4.3",
+    "widget-third-party": "git+ssh://git@github.com:kambi-sportsbook-widgets/widget-third-party.git#v1.2.0"
   },
   "license": "MIT",
   "bugs": {

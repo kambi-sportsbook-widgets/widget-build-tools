@@ -56,13 +56,17 @@ Each array object must contain key/value pairs, where key is the Label of the st
 
   Complete full clean build of the project. Copies basic configuration files (see this project `widget_config` folder) to the project
 
+  `gulp default-bundle`
+
+  Same as default but bundles the third party library file with the javascript files creating a "stand-alone" build.
+
   `gulp compile`
 
-  Compiles all sources into `/.compiledTemp/` folder, useful when developing
+  Compiles all sources into `src/transpiled/` folder, useful when developing
 
   `gulp watch`
 
-  Watches any changes in the `src` folder and calls the appropriate compillation task
+  Watches any changes in the `src` folder and calls the appropriate compilation task
 
   `gulp clean`
 

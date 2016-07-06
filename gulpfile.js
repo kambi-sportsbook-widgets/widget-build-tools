@@ -48,6 +48,8 @@
 
    var buildDir = projectRoot + '/dist/';
 
+   var bundleThirdPartyLibraries = false;
+
    // All file paths used in the gulp file are inside this object
    var paths = {
       js: {
@@ -55,7 +57,8 @@
          transpiled: transpileDir + '/js/',
          build: buildDir + '/js/',
          sourceRoot: '/js/',
-         coreLibraryFile: projectRoot + '/node_modules/widget-core-library/dist/core.js'
+         coreLibraryFile: projectRoot + '/node_modules/widget-core-library/dist/core.js',
+         thirdPartyLibraryFile: projectRoot + '/node_modules/widget-build-tools/node_modules/third-party-dependencies/dist/thirdparty.js',
       },
       css: {
          source: projectRoot + '/src/scss/',
@@ -179,6 +182,15 @@
    });
 
    /**
+    * Same as default but bundles the third party library file with
+    * the javascript file
+    */
+   gulp.task('default-bundle', ['clean'], function () {
+      bundleThirdPartyLibraries = true;
+      return gulp.start('build');
+   });
+
+   /**
     * Tasks used by 'build' to run everything in the right order
     */
    gulp.task('build2', ['copy-config-files'], function () {
@@ -222,7 +234,7 @@
             js: 'js/app.min.js',
             css: 'css/app.min.css',
             'kambi-widget-api': kambiWidgetAPIUrl,
-            'third-party-libs': resourcePaths.thirdPartyLibs
+            'third-party-libs': bundleThirdPartyLibraries ? undefined : resourcePaths.thirdPartyLibs
          },
          resourcePaths.htmlReplace
       );
@@ -355,6 +367,7 @@
     */
    gulp.task('bundle-js', function () {
       return gulp.src([
+            paths.js.thirdPartyLibraryFile,
             paths.js.coreLibraryFile,
             paths.js.transpiled + '**/*.js'
          ])
