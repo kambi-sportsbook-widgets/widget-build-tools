@@ -377,9 +377,6 @@
       if (bundleThirdPartyLibraries) {
          files = [paths.js.thirdPartyLibraryFile].concat(files);
       }
-      fs.exists(paths.js.thirdPartyLibraryFile, function (e) {
-         console.log(e);
-      });
       return gulp.src(files)
          .pipe(concat('app.js'))
          .pipe(stripDebug())
