@@ -5,11 +5,10 @@ Generalized build lifecycle for Kambi widgets.
 ## Setup
 
 ```
-npm add require-dir
+npm install require-dir
 
-npm add git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git
+npm install --save git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git
 
-npm install
 ```
 
 Replace the project gulpfile.js with:
@@ -33,7 +32,7 @@ If the widget needs extra steps in its build lifecycle custom gulp tasks can be 
 
 ## Configuration
 
-To add specific locale strings create a file called buildparameters.json in the project directoryÂ
+To add specific locale strings create a file called `buildparameters.json` in the project directory:
 
 __`buildparameters.json`__
 ```javascript
@@ -47,7 +46,38 @@ __`buildparameters.json`__
 }
 ```
 
+Another configuration file is `resourcepaths.json`, this file is for configurations specific to the environment that the widget is going to be deployed to. As such it is ignored by git and should not be comited to the repository.
+
 Each array object must contain key/value pairs, where key is the Label of the string used in template, and the value represents the object pointing to Kambi locale.js
+
+
+
+__`resourcepaths.json`__
+```javascript
+{
+   "third-party-libs": '//mydomain.com/widget-third-party/v1.2.0/thirdparty.min.js'
+   "htmlReplace": {
+       "myHtmlReplace": "//productionUrl.com/someScript.js"
+   }
+}
+```
+
+Unless you are building a widget with `gulp default-bundle` you need a resourcepaths.json file with the location of the third-party libraries ( https://github.com/kambi-sportsbook-widgets/widget-third-party ). A optional htmlReplace value can also be used, if present it will replace any tags commented like this:
+
+```html
+<!--build:myHtmlReplace-->
+<script src="//developmentUrl.com/someScript.js"></script>
+<!-- endbuild -->
+```
+
+with the value specified in the `resourcepaths.json` file. For example with the file described above that tag would be replaced with:
+
+```html
+<script src="//productionUrl.com/someScript.js"></script>
+```
+
+
+
 
 
 ## Important Gulp Tasks
@@ -58,7 +88,7 @@ Each array object must contain key/value pairs, where key is the Label of the st
 
   `gulp default-bundle`
 
-  Same as default but bundles the third party library file with the javascript files creating a "stand-alone" build.
+  Same as default but bundles the third party library file with the javascript files creating a "stand-alone" build. If this is used a `resourcepaths.json` is not required.
 
   `gulp compile`
 

@@ -58,7 +58,7 @@
          build: buildDir + '/js/',
          sourceRoot: '/js/',
          coreLibraryFile: projectRoot + '/node_modules/widget-core-library/dist/core.js',
-         thirdPartyLibraryFile: projectRoot + '/node_modules/third-party-dependencies/dist/thirdparty.js',
+         thirdPartyLibraryFile: projectRoot + '/node_modules/third-party-dependencies/dist/thirdparty.js'
       },
       css: {
          source: projectRoot + '/src/scss/',
@@ -218,7 +218,11 @@
       try {
          resourcePaths = JSON.parse(fs.readFileSync('./resourcepaths.json'));
       } catch (e) {
-         throw new Error('could not read resourcepaths.json');
+         if (bundleThirdPartyLibraries) {
+            resourcePaths = {};
+         } else {
+            throw new Error('could not read resourcepaths.json');
+         }
       }
       if (resourcePaths.htmlReplace == null) {
          resourcePaths.htmlReplace = {};
