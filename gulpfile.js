@@ -168,7 +168,7 @@
    });
 
    gulp.task('generate-mock-data', function () {
-      return gulp.src('/node_modules/widget-build-tools/widget_config/mockData.json')
+      return gulp.src([projectRoot + '/node_modules/widget-build-tools/widget_config/mockSetupData.json'])
           .pipe(vinylfs.dest(buildDir, { overwrite: false }));
    });
 
