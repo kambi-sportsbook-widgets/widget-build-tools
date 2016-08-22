@@ -169,7 +169,7 @@
 
    gulp.task('generate-mock-data', function () {
       return gulp.src([projectRoot + '/node_modules/widget-build-tools/widget_config/mockSetupData.json'])
-          .pipe(vinylfs.dest(buildDir, { overwrite: false }));
+          .pipe(vinylfs.dest(transpileDir, { overwrite: false }));
    });
 
    /**
