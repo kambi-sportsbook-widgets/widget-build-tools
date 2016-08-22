@@ -167,6 +167,11 @@
       return del.sync(transpileDir);
    });
 
+   gulp.task('generate-mock-data', function () {
+      return gulp.src('/node_modules/widget-build-tools/widget_config/mockData.json')
+          .pipe(vinylfs.dest(buildDir, { overwrite: false }));
+   });
+
    /**
     * Cleans the project (deletes transpileDir and buildDir folders)
     */
@@ -193,7 +198,7 @@
    /**
     * Tasks used by 'build' to run everything in the right order
     */
-   gulp.task('build2', ['copy-config-files'], function () {
+   gulp.task('build2', ['copy-config-files', 'generate-mock-data'], function () {
       return gulp.start('build3');
    });
    gulp.task('build3', ['compile'], function () {
