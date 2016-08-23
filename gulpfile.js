@@ -46,6 +46,8 @@
 
    var transpileDir = projectRoot + '/src/transpiled/';
 
+   var sourceDir = projectRoot + '/src/';
+
    var buildDir = projectRoot + '/dist/';
 
    var bundleThirdPartyLibraries = false;
@@ -169,7 +171,7 @@
 
    gulp.task('generate-mock-data', function () {
       return gulp.src([projectRoot + '/node_modules/widget-build-tools/widget_config/mockSetupData.json'])
-          .pipe(vinylfs.dest(transpileDir, { overwrite: false }));
+          .pipe(vinylfs.dest(sourceDir, { overwrite: false }));
    });
 
    /**
