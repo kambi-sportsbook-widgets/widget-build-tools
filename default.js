@@ -10,6 +10,9 @@ module.exports = validate({
       'main': ['./src/index.js']
    },
    module: {
+      preLoaders: [
+         { test: /.js$/, exclude: /node_modules/, loader: 'eslint-loader' }
+      ],
       loaders: [
          {test: /\.svg/, loader: 'svg-url-loader'},
          {test: /.js$/, exclude: /node_modules/, loader: 'babel-loader', query: {presets: ['es2015']}},
@@ -38,7 +41,6 @@ module.exports = validate({
       }),*/
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin(),
-//      new HtmlWebpackPlugin({ template: 'src/index.html'}),
       new CopyWebpackPlugin([{
          from: './src/i18n',
          to: 'i18n'
