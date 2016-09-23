@@ -3,6 +3,7 @@ const validate = require('webpack-validator');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const fs = require('fs');
 
 module.exports = validate({
    entry: {
@@ -21,7 +22,7 @@ module.exports = validate({
          {test: /\.html/, loader: 'html-loader'},
          {test: /\.scss$/, loaders: ['style', 'css', 'sass']}]
    },
-   resolveLoader: { root: path.join(__dirname, "node_modules") },
+   resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.resolve('./../') },
    output: {
       path: path.resolve(process.cwd(), 'dist'),
       publicPath: '/widget3/',
