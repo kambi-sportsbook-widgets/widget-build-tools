@@ -21,8 +21,9 @@ module.exports = validate({
          {test: /\.html/, loader: 'html-loader'},
          {test: /\.scss$/, loaders: ['style', 'css', 'sass']}]
    },
+   resolveLoader: { root: path.join(__dirname, "node_modules") },
    output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(process.cwd(), 'dist'),
       publicPath: '/widget3/',
       filename: '[name].js'
    },
@@ -36,7 +37,7 @@ module.exports = validate({
       }),*/
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin(),
-      new HtmlWebpackPlugin({ template: 'src/index.html'}),
+//      new HtmlWebpackPlugin({ template: 'src/index.html'}),
       new CopyWebpackPlugin([{
          from: './src/i18n',
          to: 'i18n'
