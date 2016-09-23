@@ -11,7 +11,7 @@ module.exports = validate({
    },
    module: {
       preLoaders: [
-         { test: /.js$/, exclude: /node_modules/, loader: 'eslint-loader' }
+         { test: /.js$/, exclude: /node_modules/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
       ],
       loaders: [
          {test: /\.svg/, loader: 'svg-url-loader'},
@@ -41,11 +41,12 @@ module.exports = validate({
       }),*/
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin(),
+      new HtmlWebpackPlugin({ template: 'src/index.html'}),
       new CopyWebpackPlugin([{
          from: './src/i18n',
          to: 'i18n'
       },{
-         from: './src/mockSetupData.json',
+         from: path.join(__dirname, 'widget_config', 'mockSetupData.json'),
          to: '.'
       }])
    ],
