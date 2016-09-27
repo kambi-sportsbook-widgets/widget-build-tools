@@ -1,6 +1,8 @@
 const path = require('path');
 const validate = require('webpack-validator');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const fs = require('fs');
 
 module.exports = validate({
    entry: {
@@ -8,21 +10,17 @@ module.exports = validate({
    },
    module: {
       preLoaders: [
-         { test: /.js$/, exclude: /node_modules/, loader: 'eslint-loader' }
+         { test: /.js$/, exclude: /widget-core-library/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
       ],
       loaders: [
-         { test: /\.svg/, loader: 'svg-url-loader' },
+         {test: /\.svg/, loader: 'svg-url-loader'},
+         {test: /(\.ttf|\.woff2?|\.eot)/, loader: 'url-loader'},
          { test: /.js$/, exclude: /node_modules/, loader: 'babel-loader', query: { presets: ['es2015'] } },
-         { test: /\.(ttf|woff)$|\.eot$/, loader: 'file', query: { name: 'fonts/[name].[ext]' }, },
-         {
-            test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/,
-            exclude: /node_modules/,
-            loader: 'url-loader?importLoaders=1&limit=100000'
-         },
          { test: /\.scss$/, loaders: ['style', 'css?sourceMap', 'sass?sourceMap'] },
          { test: /\.html/, loader: 'html-loader' },
          { test: /\.json$/, loader: 'json-loader' }]
    },
+   resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.resolve('./../') },
    devtool: 'source-map',
    output: {
       path: path.resolve(__dirname, 'dist'),
@@ -34,7 +32,11 @@ module.exports = validate({
    resolve: {
       extensions: ['', '.js', '.json', '.scss', '.html']
    },
-   plugins: [new HtmlWebpackPlugin({
-      template: 'src/index.html'
-   })]
+   plugins: [
+      new HtmlWebpackPlugin({template: 'src/index.html'}),
+      new CopyWebpackPlugin([
+         { from: './src/i18n', to: 'i18n' },
+         { from: path.join(__dirname, 'widget_config', 'mockSetupData.json'), to: '.' }
+      ])
+   ]
 });
