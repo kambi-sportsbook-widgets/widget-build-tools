@@ -20,7 +20,7 @@ module.exports = validate({
          { test: /\.html/, loader: 'html-loader' },
          { test: /\.json$/, loader: 'json-loader' }]
    },
-   resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.resolve('./../') },
+   resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.join(process.cwd(), 'node_modules') },
    devtool: 'source-map',
    output: {
       path: path.resolve(process.cwd(), 'dist'),

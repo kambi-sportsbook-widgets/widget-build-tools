@@ -19,6 +19,7 @@ module.exports = validate({
          {test: /\.json$/, loader: 'json'}
       ]
    },
+   resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.join(process.cwd(), 'node_modules') },
    output: {
       path: path.resolve(process.cwd(), 'dist'),
       publicPath: '/widget3/',
