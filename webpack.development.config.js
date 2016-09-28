@@ -16,7 +16,7 @@ module.exports = validate({
          {test: /\.svg/, loader: 'svg-url-loader'},
          {test: /(\.ttf|\.woff2?|\.eot)/, loader: 'url-loader'},
          { test: /.js$/, exclude: /node_modules/, loader: 'babel-loader', query: { presets: ['es2015'] } },
-         { test: /\.scss$/, loaders: ['style', 'css?sourceMap', 'sass?sourceMap'] },
+         { test: /\.scss$/, loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap'] },
          { test: /\.html/, loader: 'html-loader' },
          { test: /\.json$/, loader: 'json-loader' }]
    },

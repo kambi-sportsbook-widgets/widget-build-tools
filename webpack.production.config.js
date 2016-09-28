@@ -11,15 +11,13 @@ module.exports = validate({
    module: {
       loaders: [
          {test: /\.svg/, loader: 'svg-url-loader'},
+         {test: /\.svg/, loader: 'svg-url-loader'},
+         {test: /(\.ttf|\.woff2?|\.eot)/, loader: 'url-loader'},
          {test: /.js$/, exclude: /node_modules/, loader: 'babel-loader', query: {presets: ['es2015']}},
-         {
-            test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/,
-            exclude: /node_modules/,
-            loader: 'url-loader?importLoaders=1&limit=100000'
-         },
-         {test: /\.json$/, loader: 'json'},
+         {test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader']},
          {test: /\.html/, loader: 'html-loader'},
-         {test: /\.scss$/, loaders: ['style', 'css', 'sass']}]
+         {test: /\.json$/, loader: 'json'}
+      ]
    },
    output: {
       path: path.resolve(__dirname, 'dist'),
