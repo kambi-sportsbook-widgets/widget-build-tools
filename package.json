@@ -39,7 +39,6 @@
      "sass-loader": "^4.0.1",
      "style-loader": "^0.13.1",
      "svg-url-loader": "^1.1.0",
-     "third-party-dependencies": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-third-party.git#v1.2.0",
      "url-loader": "^0.5.7",
      "vinyl-fs": "^2.4.3",
      "webpack": "^1.13.2",

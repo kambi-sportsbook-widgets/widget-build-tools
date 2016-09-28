@@ -10,11 +10,11 @@ module.exports = validate({
    },
    module: {
       preLoaders: [
-         { test: /.js$/, exclude: /node_modules/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
+         { test: /src\/.*.js$/, exclude: /node_modules/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
       ],
       loaders: [
-         {test: /\.svg/, loader: 'svg-url-loader'},
-         {test: /(\.ttf|\.woff2?|\.eot)/, loader: 'url-loader'},
+         { test: /\.svg/, loader: 'svg-url-loader' },
+         { test: /(\.ttf|\.woff2?|\.eot)/, loader: 'url-loader' },
          { test: /.js$/, exclude: /node_modules/, loader: 'babel-loader', query: { presets: ['es2015'] } },
          { test: /\.scss$/, loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap'] },
          { test: /\.html/, loader: 'html-loader' },
