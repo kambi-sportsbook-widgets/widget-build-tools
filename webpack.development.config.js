@@ -10,7 +10,7 @@ module.exports = validate({
    },
    module: {
       preLoaders: [
-         { test: /.js$/, exclude: /widget-core-library/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
+         { test: /.js$/, exclude: /node_modules/, loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}` }
       ],
       loaders: [
          {test: /\.svg/, loader: 'svg-url-loader'},
