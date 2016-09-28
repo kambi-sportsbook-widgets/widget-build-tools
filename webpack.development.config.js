@@ -23,7 +23,7 @@ module.exports = validate({
    resolveLoader: { root: fs.existsSync(path.join(__dirname, "node_modules")) ? path.join(__dirname, "node_modules") : path.resolve('./../') },
    devtool: 'source-map',
    output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(process.cwd(), 'dist'),
       filename: 'js/[name].js'
    },
    devServer: {

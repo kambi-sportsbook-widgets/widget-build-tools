@@ -20,7 +20,7 @@ module.exports = validate({
       ]
    },
    output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(process.cwd(), 'dist'),
       publicPath: '/widget3/',
       filename: '[name].js'
    },
