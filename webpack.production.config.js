@@ -6,7 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = validate({
    entry: {
-      'main': ['./src/index.js']
+      'main.min': ['./src/index.js']
    },
    module: {
       loaders: [
@@ -27,11 +27,11 @@ module.exports = validate({
    plugins: [
       new webpack.optimize.CommonsChunkPlugin('common.js'),
       new webpack.optimize.DedupePlugin(),
-     /* new webpack.optimize.UglifyJsPlugin({
+      new webpack.optimize.UglifyJsPlugin({
          compressor: {
             warnings: true,
          },
-      }),*/
+      }),
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin(),
       new HtmlWebpackPlugin({ template: 'src/index.html'}),
