@@ -27,7 +27,8 @@ module.exports = validate({
       filename: 'js/[name].js'
    },
    devServer: {
-      contentBase: './src'
+      contentBase: './src',
+      https: true
    },
    resolve: {
       extensions: ['', '.js', '.json', '.scss', '.html']
