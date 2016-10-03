@@ -4,7 +4,7 @@ const childProcess = require('child_process'),
    getopt = require('node-getopt'),
    opn = require('opn'),
    path = require('path'),
-   packageJson = require(path.join(process.cwd(), 'package.json')),
+   packageJson = require(path.join(process.cwd(), 'package.json')), // eslint-disable-line
    webpack = require('webpack'),
    WebpackDevServer = require('webpack-dev-server'),
    fs = require('fs'),
@@ -88,6 +88,16 @@ const help = function() {
    console.log('');
 };
 
+/**
+ * Returns a webpack instance configured by webpack.config.js
+ * @param resolve function to call on success
+ * @param reject function to call on error
+ */
+const createWebpack = function() {
+   return webpack(require('../webpack.config.js')); // eslint-disable-line
+};
+
+
 // *** ACTIONS ***
 
 /**
@@ -98,12 +108,7 @@ const buildDev = function() {
    console.log(chalk.cyan('Starting the development server...'));
 
    process.env.NODE_ENV = 'development';
-
-   /* eslint-disable */
-   var compiler = webpack(require('../webpack.development.config.js'));
-
-   /* eslint-enable */
-   var devServer = new WebpackDevServer(compiler, {
+   const devServer = new WebpackDevServer(createWebpack(), {
       hot: true,
       debug: true,
       'output-pathinfo': true,
@@ -117,10 +122,9 @@ const buildDev = function() {
 
    devServer.use(devServer.middleware);
 
-   // Launch WebpackDevServer.
-   var port = 8080;
-
-   return new Promise((resolve, reject) => {
+   // Launch WebpackDevServer
+   const port = 8080;
+   return new Promise(function (resolve, reject) {
       devServer.listen(port, (err, result) => {
          if (err) {
             reject(err);
@@ -128,10 +132,10 @@ const buildDev = function() {
          }
 
          console.log('The app is running at:');
-         console.log();
          console.log('  ' + chalk.cyan('https://localhost:' + port + '/'));
+         console.log('');
 
-         resolve();
+         // resolve(); if we resolve the server closes
       });
    });
 };
@@ -141,10 +145,29 @@ const buildDev = function() {
  * @returns {Promise}
  */
 const buildProd = function() {
-   // process.env.NODE_ENV = 'production';
-   // /* eslint-disable */
-   // webpack(require('../webpack.development.config.js'));
-   // /* eslint-enable */
+   process.env.NODE_ENV = 'production';
+   return new Promise(function(resolve, reject) {
+      const compiler = createWebpack();
+      compiler.run(function(err, stats) {
+         if (err) {
+            console.error(err);
+            reject();
+            return;
+         }
+         var jsonStats = stats.toJson();
+         if (jsonStats.errors.length > 0) {
+            jsonStats.errors.forEach(function(err) {
+               console.error(err);
+            });
+         }
+         if (jsonStats.warnings.length > 0) {
+            jsonStats.warnings.forEach(function(warn) {
+               console.warn(warn);
+            });
+         }
+         resolve(compiler);
+      });
+   });
 };
 
 /**
@@ -166,22 +189,46 @@ const postversion = function(withoutChangelog) {
             return;
          }
 
-         const changelogURL = repositoryURL()
-            .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
-            .concat(`/releases/tag/v${packageJson.version}`);
+         try {
+            const changelogURL = repositoryURL()
+               .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
+               .concat(`/releases/tag/v${packageJson.version}`);
 
-         // GitHub needs some time to publish our commit
-         console.log('Waiting for GitHub...');
+            // GitHub needs some time to publish our commit
+            console.log('Waiting for GitHub...');
 
-         return new Promise((resolve) => {
-            setTimeout(() => {
-               opn(changelogURL);
-               resolve();
-            }, 2000);
-         });
+            return new Promise((resolve) => {
+               setTimeout(() => {
+                  opn(changelogURL);
+                  resolve();
+               }, 2000);
+            });
+         } catch (e) { return; }
       });
 };
 
+/**
+ * Deletes a folder recursevely
+ * @param path {String} the path to delete
+ * @returns {Promise}
+ */
+const cleanDist = function() {
+   const deleteFolderRecursive = function(path) {
+      if (fs.existsSync(path)) {
+         fs.readdirSync(path).forEach(function(file, index) {
+            const curPath = path + '/' + file;
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+               deleteFolderRecursive(curPath);
+            } else { // delete file
+               fs.unlinkSync(curPath);
+            }
+         });
+         fs.rmdirSync(path);
+      }
+   }
+   deleteFolderRecursive('dist');
+   return Promise.resolve();
+};
 // *** MAIN ***
 
 // check arguments
@@ -198,6 +245,12 @@ if (process.argv.indexOf('-h') > -1 || process.argv.indexOf('--help') > -1) {
 
 // dispatch action
 switch (process.argv[2]) {
+   case 'clean': {
+
+      action(cleanDist);
+
+      break;
+   }
    case 'build': {
       const opt = getopt.create([
          ['d', 'dev'],

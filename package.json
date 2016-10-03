@@ -3,8 +3,7 @@
   "version": "1.4.5",
   "description": "Build tools shared between the widgets",
   "bin": {
-    "widget-build-tools": "./bin/widget-build-tools.js",
-    "build-tools": "./bin/cli.js"
+    "kambi-widgets-cli": "./bin/cli.js"
   },
   "repository": {
     "type": "git",
@@ -21,7 +20,6 @@
     "babel-preset-es2015": "^6.16.0",
     "chalk": "^1.1.3",
     "copy-webpack-plugin": "^3.0.1",
-    "cross-spawn": "^4.0.2",
     "css-loader": "^0.25.0",
     "eslint": "^3.6.1",
     "eslint-config-airbnb": "^12.0.0",
