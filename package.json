@@ -2,9 +2,8 @@
   "name": "widget-build-tools",
   "version": "1.4.5",
   "description": "Build tools shared between the widgets",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "changelog": "changelog kambi-sportsbook-widgets/seed-project-widget all -m > CHANGELOG.md"
+  "bin": {
+    "widget-build-tools": "./bin/widget-build-tools.js"
   },
   "repository": {
     "type": "git",
@@ -15,6 +14,9 @@
     "url": "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
   },
   "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme",
+  "dependencies": {
+     "cross-spawn": "^4.0.2"
+  },
   "devDependencies": {
     "copy-webpack-plugin": "^3.0.1",
     "eslint": "^3.6.1",
