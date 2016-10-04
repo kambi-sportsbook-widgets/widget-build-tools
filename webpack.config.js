@@ -21,8 +21,20 @@ let plugins = [
    })
 ];
 
+let scssLoaders = [
+   'style-loader',
+   'css-loader?sourceMap',
+   'sass-loader?sourceMap'
+];
+
 if (process.env.NODE_ENV === 'production') {
    devtool = false;
+
+   scssLoaders = [
+      'style-loader',
+      'css-loader',
+      'sass-loader'
+   ];
 
    plugins = plugins.concat([
       new webpack.optimize.CommonsChunkPlugin('common.js'),
@@ -101,10 +113,7 @@ module.exports = validate({
          },
          {
             test: /\.scss$/,
-            loaders: [
-               'style-loader',
-               'css-loader?sourceMap', 'sass-loader?sourceMap'
-            ]
+            loaders: scssLoaders
          },
          {
             test: /\.html/,
