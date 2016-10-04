@@ -4,7 +4,6 @@ const childProcess = require('child_process'),
    getopt = require('node-getopt'),
    opn = require('opn'),
    path = require('path'),
-   packageJson = require(path.join(process.cwd(), 'package.json')), // eslint-disable-line
    webpack = require('webpack'),
    WebpackDevServer = require('webpack-dev-server'),
    fs = require('fs-extra'),
@@ -13,13 +12,14 @@ const childProcess = require('child_process'),
 /**
  * Executes given command. Prints results to stdout/stderr.
  * @param {string} cmd Command to be executed
+ * @param {object} options Options object
  * @returns {Promise}
  */
-const exec = (cmd) => {
+const exec = (cmd, options) => {
    return new Promise((resolve, reject) => {
       console.log(`> ${cmd}`);
 
-      childProcess.exec(cmd, {}, (error, stdout, stderr) => {
+      childProcess.exec(cmd, options, (error, stdout, stderr) => {
          if (error) {
             reject(error);
             return;
@@ -34,23 +34,91 @@ const exec = (cmd) => {
 };
 
 /**
+ * Reads file from disk.
+ * @param {string} path Path of file
+ * @returns {Promise.<buffer>}
+ */
+const readFile = function(path) {
+   return new Promise((resolve, reject) => {
+      fs.readFile(path, 'utf8', function(error, data) {
+         if (error) {
+            reject(error);
+            return;
+         }
+
+         resolve(data);
+      });
+   });
+};
+
+/**
+ * Writes file to disk.
+ * @param {string} path Path to be written
+ * @param {string|buffer} data Data to be written
+ * @returns {Promise}
+ */
+const writeFile = (path, data) => {
+   return new Promise((resolve, reject) => {
+      fs.writeFile(path, data, (error) => {
+         if (error) {
+            reject(error);
+            return;
+         }
+
+         resolve();
+      });
+   });
+};
+
+/**
+ * Reads JSON file from disk.
+ * @param {string} path File path
+ * @returns {Promise.<object>}
+ */
+const readJson = (path) => {
+   return readFile(path)
+      .then(data => JSON.parse);
+};
+
+/**
+ * Recursively creates a directory.
+ * @param {string} path Directory to create
+ * @returns {Promise}
+ */
+const mkdirp = (path) => {
+   return new Promise((resolve, reject) => {
+      fs.mkdirp(path, (error) => {
+         if (error) {
+            reject(error);
+            return;
+         }
+
+         resolve();
+      });
+   });
+};
+
+/**
  * Extracts repository URL from package.json.
- * @returns {string}
+ * @returns {Promise.<string>}
  */
 const repositoryURL = () => {
-   if (!packageJson.hasOwnProperty('repository')) {
-      throw new Error('Missing \'repository\' field in package.json');
-   }
+   return readJson(path.join(process.cwd(), 'package.json'))
+      .then((packageJson) => {
+         if (!packageJson.hasOwnProperty('repository')) {
+            throw new Error('Missing \'repository\' field in package.json');
+         }
 
-   if (packageJson.repository.isPrototypeOf(String)) {
-      return packageJson.repository;
-   }
+         if (packageJson.repository.isPrototypeOf(String)) {
+            return packageJson.repository;
+         }
 
-   if (!packageJson.repository.hasOwnProperty('url')) {
-      throw new Error('Missing \'repository.url\' field in package.json');
-   }
+         if (!packageJson.repository.hasOwnProperty('url')) {
+            throw new Error('Missing \'repository.url\' field in package.json');
+         }
 
-   return packageJson.repository.url;
+         return packageJson.repository.url;
+      });
 };
 
 /**
@@ -58,7 +126,7 @@ const repositoryURL = () => {
  * @param {function} func Pointer to action's function
  * @param {object...} args Action arguments
  */
-const action = (func) => {
+const action = function(func) {
    func.apply(undefined,
          Array.prototype.slice.call(arguments, 1))
       .then(
@@ -74,22 +142,97 @@ const action = (func) => {
  * Displays help message.
  */
 const help = () => {
-   console.log('Usage: build-tools <action> [options...]');
+   console.log('Usage: kambi-widgets-cli <action> [options...]');
    console.log('');
    console.log('Actions:');
    console.log('');
-   console.log('build\t\t\tBuilds widget for given environment');
-   console.log('\t-d|--dev\tStarts a development server (default)');
-   console.log('\t-p|--prod\tBuild production distribution');
+   console.log('init <project_name>\t\t\tCreates new widget project');
+   console.log('\t-d|--description\t\tProject description');
+   console.log('\t-f|--force\t\t\tForce project creation');
+   console.log('\t-i|--without-npm-install\tDoes not run npm install');
+   console.log('\t-v|--version\t\t\tProject version');
    console.log('');
-   console.log('preversion\t\t\tRuns NPM\'s preversion hook');
+   console.log('clean\t\t\t\t\tCleans build files');
    console.log('');
-   console.log('postversion\t\t\tRuns NPM\'s postversion hook');
-   console.log('\t--without-changelog\tDoesn\'t open browser with changelog');
+   console.log('start\t\t\t\t\tStarts a development server');
+   console.log('');
+   console.log('build\t\t\t\t\tBuilds widget for production environment');
+   console.log('');
+   console.log('preversion\t\t\t\tRuns NPM\'s preversion hook');
+   console.log('');
+   console.log('postversion\t\t\t\tRuns NPM\'s postversion hook');
+   console.log('\t--without-changelog\t\tDoesn\'t open browser with changelog');
    console.log('');
 };
 
 // *** ACTIONS ***
+
+/**
+ * Initializes a fresh widgets project.
+ * @param {string} projectName Project name
+ * @param {object} options Options object
+ * @returns {Promise}
+ */
+const init = function(projectName, options) {
+   if (fs.existsSync(projectName) && !options.force) {
+      return Promise.reject(new Error(`Error: Directory ${projectName} exists. You can use --force to force creating it.`));
+   }
+
+   // map of what needs to be copied where
+   const files = {
+      'app.scss': 'src/scss/',
+      'index.html': 'src/',
+      'index.js': 'src/',
+      'package.json': '',
+      'README.md': ''
+   };
+
+   // variables to replace across all files
+   const vars = {
+      projectName: projectName,
+      projectVersion: options.version || '1.0.0',
+      projectDescription: options.description || `Description of ${projectName}`
+   };
+
+   const fileKeys = Object.keys(files);
+
+   // create outer directory
+   return mkdirp(projectName)
+
+      // read all templates
+      .then(() => Promise.all(fileKeys.map(name => readFile(path.join(__dirname, '../template', name)))))
+
+      // inject variables
+      .then(fileContents => fileContents.map((fileContent) => {
+         return Object.keys(vars)
+            .reduce(
+               (fileContent, varName) => fileContent.replace(new RegExp(`\\$\\{${varName}\\}`, 'g'), vars[varName]),
+               fileContent
+            );
+      }))
+
+      // create inner directories and write files
+      .then((fileContents) => {
+         return Promise.all(
+            fileContents.map((fileContent, i) => {
+               const fileName = fileKeys[i],
+                  filePath = files[fileName];
+
+               return mkdirp(path.join(projectName, filePath))
+                  .then(() => writeFile(path.join(projectName, filePath, fileName), fileContent));
+            })
+         );
+      })
+
+      // run npm install
+      .then(() => {
+         if (options['without-npm-install']) {
+            return Promise.resolve();
+         }
+
+         return exec('npm install', {cwd: path.join(process.cwd(), projectName)});
+      });
+};
 
 /**
  * Starts a development server for widget.
@@ -177,33 +320,30 @@ const preversion = () => {
  * @returns {Promise}
  */
 const postversion = (withoutChangelog) => {
-   return exec('git push --follow-tags')
-      .then(() => {
+   return Promise.all([exec('git push --follow-tags'), readFile(path.join(process.cwd(), 'package.json'))])
+      .then((results) => {
          if (withoutChangelog) {
             return;
          }
 
-         try {
-            const changelogURL = repositoryURL()
-               .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
-               .concat(`/releases/tag/v${packageJson.version}`);
+         const changelogURL = repositoryURL()
+            .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
+            .concat(`/releases/tag/v${results[1].version}`);
 
-            // GitHub needs some time to publish our commit
-            console.log('Waiting for GitHub...');
+         // GitHub needs some time to publish our commit
+         console.log('Waiting for GitHub...');
 
-            return new Promise((resolve) => {
-               setTimeout(() => {
-                  opn(changelogURL);
-                  resolve();
-               }, 2000);
-            });
-         } catch (e) { return; }
+         return new Promise((resolve) => {
+            setTimeout(() => {
+               opn(changelogURL);
+               resolve();
+            }, 2000);
+         });
       });
 };
 
 /**
  * Deletes a folder recursevely
- * @param path {String} the path to delete
  * @returns {Promise}
  */
 const cleanDist = () => {
@@ -219,7 +359,7 @@ const cleanDist = () => {
          });
          fs.rmdirSync(path);
       }
-   }
+   };
    deleteFolderRecursive('dist');
    return Promise.resolve();
 };
@@ -312,6 +452,25 @@ switch (process.argv[2]) {
          .then(() => {
             action(buildProd);
          });
+      break;
+   }
+
+   case 'init': {
+      const opt = getopt.create([
+         ['d', 'description=ARG'],
+         ['f', 'force'],
+         ['i', 'without-npm-install'],
+         ['v', 'version=ARG']
+      ])
+         .parseSystem();
+
+      if (opt.argv.length < 2) {
+         console.error('Missing required argument: project_name');
+         break;
+      }
+
+      action(init, opt.argv[1], opt.options);
+
       break;
    }
 
