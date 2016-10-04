@@ -57,10 +57,6 @@ plugins = plugins.concat([
       {
          from: './src/mockSetupData.json',
          to: '.'
-      },
-      {
-         from: path.join(__dirname, 'widget_config', 'mockSetupData.json'),
-         to: '.'
       }
    ])
 ]);

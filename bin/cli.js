@@ -7,7 +7,7 @@ const childProcess = require('child_process'),
    packageJson = require(path.join(process.cwd(), 'package.json')), // eslint-disable-line
    webpack = require('webpack'),
    WebpackDevServer = require('webpack-dev-server'),
-   fs = require('fs'),
+   fs = require('fs-extra'),
    chalk = require('chalk');
 
 /**
@@ -229,6 +229,55 @@ const cleanDist = function() {
    deleteFolderRecursive('dist');
    return Promise.resolve();
 };
+
+
+/**
+ * Copies config files to the widget folder
+ */
+const copyConfigFiles = function() {
+   const fileNames = [
+      '.editorconfig',
+      '.eslintrc',
+      '.scss-lint',
+      'LICENSE',
+      'gitignore',
+      'mockSetupData.json'
+   ];
+   const configFolder = path.join(process.cwd(), 'node_modules/widget-build-tools/widget_config/');
+   const paths = fileNames.map(function(p) {
+      return path.join(configFolder, p);
+   });
+   for (let i = 0; i < 3; i++) {
+      if (fs.existsSync(paths[i])) {
+         fs.copySync(paths[i], path.join(process.cwd(), fileNames[i]));
+      }
+   }
+
+   // files with special handling
+
+   // LICENSE file, we don't copy it if it is already there
+   if (fs.existsSync(paths[3])) {
+      const dest = path.join(process.cwd(), fileNames[3]);
+      if (!fs.existsSync(dest)) {
+         fs.copySync(paths[3], dest);
+      }
+   }
+
+   // gitignore, we need to rename it to .gitignore (npm strips .gitignore)
+   if (fs.existsSync(paths[4])) {
+      const dest = path.join(process.cwd(), '.' + fileNames[4]);
+      fs.copySync(paths[4], dest);
+   }
+
+   // mockSetupData.json, we need to copy it to /src/ and only if it doesn't exist
+   if (fs.existsSync(paths[5])) {
+      const dest = path.join(process.cwd(), '/src/' + fileNames[5]);
+      if (!fs.existsSync(dest)) {
+         fs.copySync(paths[5], dest);
+      }
+   }
+};
+
 // *** MAIN ***
 
 // check arguments
@@ -246,12 +295,13 @@ if (process.argv.indexOf('-h') > -1 || process.argv.indexOf('--help') > -1) {
 // dispatch action
 switch (process.argv[2]) {
    case 'clean': {
-
+      copyConfigFiles();
       action(cleanDist);
 
       break;
    }
    case 'build': {
+      copyConfigFiles();
       const opt = getopt.create([
          ['d', 'dev'],
          ['p', 'prod']
