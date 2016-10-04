@@ -5,17 +5,9 @@
   },
   "extends": "airbnb",
   "globals": {
-    "angular":false,
-    "$":false,
-    "Ext":false,
-    "MobileDetect":true,
-    "FastClick":true,
     "FB":true,
-    "addToHomeScreen":true,
     "rivets":true,
-    "Stapes":true,
     "Promise":true,
-    "CoreLibrary":true,
     "fetch":true,
     "sightglass":true
   },
