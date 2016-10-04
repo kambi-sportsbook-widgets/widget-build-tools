@@ -138,24 +138,23 @@ const buildDev = () => {
 const buildProd = () => {
    return new Promise((resolve, reject) => {
       process.env.NODE_ENV = 'production';
-      const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
+      const config = require('../webpack.config.js'); // eslint-disable-line
+
+      const compiler = webpack(config);
       compiler.run((err, stats) => {
          if (err) {
             console.error(err);
             reject();
             return;
          }
-         var jsonStats = stats.toJson();
-         if (jsonStats.errors.length > 0) {
-            jsonStats.errors.forEach((err) => {
-               console.error(err);
-            });
+
+         process.stdout.write(stats.toString(Object.assign(config, { colors: true })) + '\n');
+
+         if (stats.compilation.errors.length > 0) {
+            reject();
+            return;
          }
-         if (jsonStats.warnings.length > 0) {
-            jsonStats.warnings.forEach((warn) => {
-               console.warn(warn);
-            });
-         }
+
          resolve(compiler);
       });
    });
