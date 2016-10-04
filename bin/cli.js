@@ -109,6 +109,10 @@ const buildDev = () => {
          ignored: /node_modules/
       },
       https: true,
+      quiet: false,
+      stats: {
+         colors: true
+      }
    });
 
    devServer.use(devServer.middleware);
