@@ -15,7 +15,7 @@ const childProcess = require('child_process'),
  * @param {string} cmd Command to be executed
  * @returns {Promise}
  */
-const exec = function(cmd) {
+const exec = (cmd) => {
    return new Promise((resolve, reject) => {
       console.log(`> ${cmd}`);
 
@@ -37,7 +37,7 @@ const exec = function(cmd) {
  * Extracts repository URL from package.json.
  * @returns {string}
  */
-const repositoryURL = function() {
+const repositoryURL = () => {
    if (!packageJson.hasOwnProperty('repository')) {
       throw new Error('Missing \'repository\' field in package.json');
    }
@@ -58,8 +58,9 @@ const repositoryURL = function() {
  * @param {function} func Pointer to action's function
  * @param {object...} args Action arguments
  */
-const action = function(func, ...args) {
-   func.apply(undefined, args)
+const action = (func) => {
+   func.apply(undefined,
+         Array.prototype.slice.call(arguments, 1))
       .then(
          () => process.exit(0),
          (error) => {
@@ -72,7 +73,7 @@ const action = function(func, ...args) {
 /**
  * Displays help message.
  */
-const help = function() {
+const help = () => {
    console.log('Usage: build-tools <action> [options...]');
    console.log('');
    console.log('Actions:');
@@ -88,27 +89,17 @@ const help = function() {
    console.log('');
 };
 
-/**
- * Returns a webpack instance configured by webpack.config.js
- * @param resolve function to call on success
- * @param reject function to call on error
- */
-const createWebpack = function() {
-   return webpack(require('../webpack.config.js')); // eslint-disable-line
-};
-
-
 // *** ACTIONS ***
 
 /**
  * Starts a development server for widget.
  * @returns {Promise}
  */
-const buildDev = function() {
+const buildDev = () => {
    console.log(chalk.cyan('Starting the development server...'));
-
    process.env.NODE_ENV = 'development';
-   const devServer = new WebpackDevServer(createWebpack(), {
+   const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
+   const devServer = new WebpackDevServer(compiler, {
       hot: true,
       debug: true,
       'output-pathinfo': true,
@@ -124,7 +115,7 @@ const buildDev = function() {
 
    // Launch WebpackDevServer
    const port = 8080;
-   return new Promise(function (resolve, reject) {
+   return new Promise((resolve, reject) => {
       devServer.listen(port, (err, result) => {
          if (err) {
             reject(err);
@@ -144,11 +135,11 @@ const buildDev = function() {
  * Builds a distributable package of widget.
  * @returns {Promise}
  */
-const buildProd = function() {
-   process.env.NODE_ENV = 'production';
-   return new Promise(function(resolve, reject) {
-      const compiler = createWebpack();
-      compiler.run(function(err, stats) {
+const buildProd = () => {
+   return new Promise((resolve, reject) => {
+      process.env.NODE_ENV = 'production';
+      const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
+      compiler.run((err, stats) => {
          if (err) {
             console.error(err);
             reject();
@@ -156,12 +147,12 @@ const buildProd = function() {
          }
          var jsonStats = stats.toJson();
          if (jsonStats.errors.length > 0) {
-            jsonStats.errors.forEach(function(err) {
+            jsonStats.errors.forEach((err) => {
                console.error(err);
             });
          }
          if (jsonStats.warnings.length > 0) {
-            jsonStats.warnings.forEach(function(warn) {
+            jsonStats.warnings.forEach((warn) => {
                console.warn(warn);
             });
          }
@@ -174,7 +165,7 @@ const buildProd = function() {
  * NPM's preversion hook
  * @returns {Promise}
  */
-const preversion = function() {
+const preversion = () => {
    return exec('git reset HEAD');
 };
 
@@ -182,7 +173,7 @@ const preversion = function() {
  * NPM's postversion hook
  * @returns {Promise}
  */
-const postversion = function(withoutChangelog) {
+const postversion = (withoutChangelog) => {
    return exec('git push --follow-tags')
       .then(() => {
          if (withoutChangelog) {
@@ -212,10 +203,10 @@ const postversion = function(withoutChangelog) {
  * @param path {String} the path to delete
  * @returns {Promise}
  */
-const cleanDist = function() {
-   const deleteFolderRecursive = function(path) {
+const cleanDist = () => {
+   const deleteFolderRecursive = (path) => {
       if (fs.existsSync(path)) {
-         fs.readdirSync(path).forEach(function(file, index) {
+         fs.readdirSync(path).forEach((file, index) => {
             const curPath = path + '/' + file;
             if (fs.lstatSync(curPath).isDirectory()) { // recurse
                deleteFolderRecursive(curPath);
@@ -233,8 +224,10 @@ const cleanDist = function() {
 
 /**
  * Copies config files to the widget folder
+ * This method is synchronous
+ * @returns {Promise}
  */
-const copyConfigFiles = function() {
+const copyConfigFiles = () => {
    const fileNames = [
       '.editorconfig',
       '.eslintrc',
@@ -244,7 +237,7 @@ const copyConfigFiles = function() {
       'mockSetupData.json'
    ];
    const configFolder = path.join(process.cwd(), 'node_modules/widget-build-tools/widget_config/');
-   const paths = fileNames.map(function(p) {
+   const paths = fileNames.map((p) => {
       return path.join(configFolder, p);
    });
    for (let i = 0; i < 3; i++) {
@@ -276,6 +269,8 @@ const copyConfigFiles = function() {
          fs.copySync(paths[5], dest);
       }
    }
+
+   return Promise.resolve();
 };
 
 // *** MAIN ***
@@ -295,24 +290,25 @@ if (process.argv.indexOf('-h') > -1 || process.argv.indexOf('--help') > -1) {
 // dispatch action
 switch (process.argv[2]) {
    case 'clean': {
-      copyConfigFiles();
-      action(cleanDist);
-
+      copyConfigFiles().then(() => {
+         action(cleanDist);
+      });
       break;
    }
-   case 'build': {
-      copyConfigFiles();
-      const opt = getopt.create([
-         ['d', 'dev'],
-         ['p', 'prod']
-      ]).parseSystem();
 
-      if (opt.options['prod']) {
-         action(buildProd);
-      } else {
+   case 'start': {
+      copyConfigFiles().then(() => {
          action(buildDev);
-      }
+      });
+      break;
+   }
 
+   case 'build': {
+      cleanDist()
+         .then(copyConfigFiles)
+         .then(() => {
+            action(buildProd);
+         });
       break;
    }
 
