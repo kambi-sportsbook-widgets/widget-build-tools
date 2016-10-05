@@ -1,4 +1,12 @@
-node_modules
 .idea
-dist
-.project
+node_modules
+.awspublish-*
+.sass-cache/
+docs
+*.map
+bower_components
+/.project
+mockSetupData.json
+/dist/
+npm-debug.log
+.DS_Store
