@@ -1,6 +1,6 @@
 import { coreLibrary, widgetModule } from 'widget-core-library';
 import './index.html';
-import './scss/app.scss';
+import './app.scss';
 
 coreLibrary.init({
    // default arguments
