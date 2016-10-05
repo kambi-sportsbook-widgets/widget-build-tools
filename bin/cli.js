@@ -1,496 +1,77 @@
 #!/usr/bin/env node
 
-const childProcess = require('child_process'),
-   getopt = require('node-getopt'),
-   opn = require('opn'),
-   path = require('path'),
-   webpack = require('webpack'),
-   WebpackDevServer = require('webpack-dev-server'),
-   fs = require('fs-extra'),
-   chalk = require('chalk');
+const getopt = require('node-getopt');
 
-/**
- * Executes given command. Prints results to stdout/stderr.
- * @param {string} cmd Command to be executed
- * @param {object} options Options object
- * @returns {Promise}
- */
-const exec = (cmd, options) => {
-   return new Promise((resolve, reject) => {
-      console.log(`> ${cmd}`);
-
-      childProcess.exec(cmd, options, (error, stdout, stderr) => {
-         if (error) {
-            reject(error);
-            return;
-         }
-
-         process.stdout.write(stdout);
-         process.stderr.write(stderr);
-
-         resolve();
-      });
-   });
-};
-
-/**
- * Reads file from disk.
- * @param {string} path Path of file
- * @returns {Promise.<buffer>}
- */
-const readFile = function(path) {
-   return new Promise((resolve, reject) => {
-      fs.readFile(path, 'utf8', function(error, data) {
-         if (error) {
-            reject(error);
-            return;
-         }
-
-         resolve(data);
-      });
-   });
-};
-
-/**
- * Writes file to disk.
- * @param {string} path Path to be written
- * @param {string|buffer} data Data to be written
- * @returns {Promise}
- */
-const writeFile = (path, data) => {
-   return new Promise((resolve, reject) => {
-      fs.writeFile(path, data, (error) => {
-         if (error) {
-            reject(error);
-            return;
-         }
-
-         resolve();
-      });
-   });
-};
-
-/**
- * Reads JSON file from disk.
- * @param {string} path File path
- * @returns {Promise.<object>}
- */
-const readJson = (path) => {
-   return readFile(path)
-      .then(data => JSON.parse);
-};
-
-/**
- * Recursively creates a directory.
- * @param {string} path Directory to create
- * @returns {Promise}
- */
-const mkdirp = (path) => {
-   return new Promise((resolve, reject) => {
-      fs.mkdirp(path, (error) => {
-         if (error) {
-            reject(error);
-            return;
-         }
-
-         resolve();
-      });
-   });
-};
-
-/**
- * Extracts repository URL from package.json.
- * @returns {Promise.<string>}
- */
-const repositoryURL = () => {
-   return readJson(path.join(process.cwd(), 'package.json'))
-      .then((packageJson) => {
-         if (!packageJson.hasOwnProperty('repository')) {
-            throw new Error('Missing \'repository\' field in package.json');
-         }
-
-         if (packageJson.repository.isPrototypeOf(String)) {
-            return packageJson.repository;
-         }
-
-         if (!packageJson.repository.hasOwnProperty('url')) {
-            throw new Error('Missing \'repository.url\' field in package.json');
-         }
-
-         return packageJson.repository.url;
-      });
-};
-
-/**
- * Runs given action and handles errors.
- * @param {function} func Pointer to action's function
- * @param {object...} args Action arguments
- */
-const action = function(func) {
-   func.apply(undefined,
-         Array.prototype.slice.call(arguments, 1))
-      .then(
-         () => process.exit(0),
-         (error) => {
-            console.error(error);
-            process.exit(1);
-         }
-      );
-};
+// construct actions array
+const actions = require('./init')
+   .concat(require('./build'))
+   .concat(require('./version'));
 
 /**
  * Displays help message.
  */
 const help = () => {
+   const pad = (str) => {
+      for (let i = str.length - 1; i < 35; i++) {
+         str += ' ';
+      }
+
+      return str;
+   };
+
    console.log('Usage: kambi-widgets-cli <action> [options...]');
    console.log('');
    console.log('Actions:');
    console.log('');
-   console.log('init <project_name>\t\t\tCreates new widget project');
-   console.log('\t-d|--description\t\tProject description');
-   console.log('\t-f|--force\t\t\tForce project creation');
-   console.log('\t-i|--without-npm-install\tDoes not run npm install');
-   console.log('\t-v|--version\t\t\tProject version');
-   console.log('');
-   console.log('clean\t\t\t\t\tCleans build files');
-   console.log('');
-   console.log('start\t\t\t\t\tStarts a development server');
-   console.log('');
-   console.log('build\t\t\t\t\tBuilds widget for production environment');
-   console.log('');
-   console.log('preversion\t\t\t\tRuns NPM\'s preversion hook');
-   console.log('');
-   console.log('postversion\t\t\t\tRuns NPM\'s postversion hook');
-   console.log('\t--without-changelog\t\tDoesn\'t open browser with changelog');
-   console.log('');
-};
 
-// *** ACTIONS ***
+   actions.forEach((action) => {
+      const actionName = action.config.usage || action.config.name;
 
-/**
- * Initializes a fresh widgets project.
- * @param {string} projectName Project name
- * @param {object} options Options object
- * @returns {Promise}
- */
-const init = function(projectName, options) {
-   if (fs.existsSync(projectName) && !options.force) {
-      return Promise.reject(new Error(`Error: Directory ${projectName} exists. You can use --force to force creating it.`));
-   }
+      console.log(`${pad(actionName)}${action.config.description}`);
 
-   // map of what needs to be copied where
-   const files = {
-      'app.scss': 'src/scss/',
-      'index.html': 'src/',
-      'index.js': 'src/',
-      'package.json': '',
-      'README.md': ''
-   };
-
-   // variables to replace across all files
-   const vars = {
-      projectName: projectName,
-      projectVersion: options.version || '1.0.0',
-      projectDescription: options.description || `Description of ${projectName}`
-   };
-
-   const fileKeys = Object.keys(files);
-
-   // create outer directory
-   return mkdirp(projectName)
-
-      // read all templates
-      .then(() => Promise.all(fileKeys.map(name => readFile(path.join(__dirname, '../template', name)))))
-
-      // inject variables
-      .then(fileContents => fileContents.map((fileContent) => {
-         return Object.keys(vars)
-            .reduce(
-               (fileContent, varName) => fileContent.replace(new RegExp(`\\$\\{${varName}\\}`, 'g'), vars[varName]),
-               fileContent
-            );
-      }))
-
-      // create inner directories and write files
-      .then((fileContents) => {
-         return Promise.all(
-            fileContents.map((fileContent, i) => {
-               const fileName = fileKeys[i],
-                  filePath = files[fileName];
-
-               return mkdirp(path.join(projectName, filePath))
-                  .then(() => writeFile(path.join(projectName, filePath, fileName), fileContent));
-            })
-         );
-      })
-
-      // run npm install
-      .then(() => {
-         if (options['without-npm-install']) {
-            return Promise.resolve();
-         }
-
-         return exec('npm install', {cwd: path.join(process.cwd(), projectName)});
-      });
-};
-
-/**
- * Starts a development server for widget.
- * @returns {Promise}
- */
-const buildDev = () => {
-   console.log(chalk.cyan('Starting the development server...'));
-   process.env.NODE_ENV = 'development';
-   const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
-   const devServer = new WebpackDevServer(compiler, {
-      hot: true,
-      debug: true,
-      'output-pathinfo': true,
-      inline: true,
-      watch: true,
-      watchOptions: {
-         ignored: /node_modules/
-      },
-      https: true,
-      quiet: false,
-      stats: {
-         colors: true
-      }
-   });
-
-   devServer.use(devServer.middleware);
-
-   // Launch WebpackDevServer
-   const port = 8080;
-   return new Promise((resolve, reject) => {
-      devServer.listen(port, (err, result) => {
-         if (err) {
-            reject(err);
-            return;
-         }
-
-         console.log('The app is running at:');
-         console.log('  ' + chalk.cyan('https://localhost:' + port + '/'));
-         console.log('');
-
-         // resolve(); if we resolve the server closes
-      });
-   });
-};
-
-/**
- * Builds a distributable package of widget.
- * @returns {Promise}
- */
-const buildProd = () => {
-   return new Promise((resolve, reject) => {
-      process.env.NODE_ENV = 'production';
-      const config = require('../webpack.config.js'); // eslint-disable-line
-
-      const compiler = webpack(config);
-      compiler.run((err, stats) => {
-         if (err) {
-            console.error(err);
-            reject();
-            return;
-         }
-
-         process.stdout.write(stats.toString(Object.assign(config, { colors: true })) + '\n');
-
-         if (stats.compilation.errors.length > 0) {
-            reject();
-            return;
-         }
-
-         resolve(compiler);
-      });
-   });
-};
-
-/**
- * NPM's preversion hook
- * @returns {Promise}
- */
-const preversion = () => {
-   return exec('git reset HEAD');
-};
-
-/**
- * NPM's postversion hook
- * @returns {Promise}
- */
-const postversion = (withoutChangelog) => {
-   return Promise.all([exec('git push --follow-tags'), readFile(path.join(process.cwd(), 'package.json'))])
-      .then((results) => {
-         if (withoutChangelog) {
-            return;
-         }
-
-         const changelogURL = repositoryURL()
-            .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
-            .concat(`/releases/tag/v${results[1].version}`);
-
-         // GitHub needs some time to publish our commit
-         console.log('Waiting for GitHub...');
-
-         return new Promise((resolve) => {
-            setTimeout(() => {
-               opn(changelogURL);
-               resolve();
-            }, 2000);
+      if (action.config.options) {
+         action.config.options.forEach((option) => {
+            console.log(`${pad('   --' + option[1])}${option[2]}`);
          });
-      });
-};
-
-/**
- * Deletes a folder recursevely
- * @returns {Promise}
- */
-const cleanDist = () => {
-   const deleteFolderRecursive = (path) => {
-      if (fs.existsSync(path)) {
-         fs.readdirSync(path).forEach((file, index) => {
-            const curPath = path + '/' + file;
-            if (fs.lstatSync(curPath).isDirectory()) { // recurse
-               deleteFolderRecursive(curPath);
-            } else { // delete file
-               fs.unlinkSync(curPath);
-            }
-         });
-         fs.rmdirSync(path);
       }
-   };
-   deleteFolderRecursive('dist');
-   return Promise.resolve();
-};
 
-
-/**
- * Copies config files to the widget folder
- * This method is synchronous
- * @returns {Promise}
- */
-const copyConfigFiles = () => {
-   const fileNames = [
-      '.editorconfig',
-      '.eslintrc',
-      '.scss-lint',
-      'LICENSE',
-      'gitignore',
-      'mockSetupData.json'
-   ];
-   const configFolder = path.join(process.cwd(), 'node_modules/widget-build-tools/widget_config/');
-   const paths = fileNames.map((p) => {
-      return path.join(configFolder, p);
+      console.log('');
    });
-   for (let i = 0; i < 3; i++) {
-      if (fs.existsSync(paths[i])) {
-         fs.copySync(paths[i], path.join(process.cwd(), fileNames[i]));
-      }
-   }
-
-   // files with special handling
-
-   // LICENSE file, we don't copy it if it is already there
-   if (fs.existsSync(paths[3])) {
-      const dest = path.join(process.cwd(), fileNames[3]);
-      if (!fs.existsSync(dest)) {
-         fs.copySync(paths[3], dest);
-      }
-   }
-
-   // gitignore, we need to rename it to .gitignore (npm strips .gitignore)
-   if (fs.existsSync(paths[4])) {
-      const dest = path.join(process.cwd(), '.' + fileNames[4]);
-      fs.copySync(paths[4], dest);
-   }
-
-   // mockSetupData.json, we need to copy it to /src/ and only if it doesn't exist
-   if (fs.existsSync(paths[5])) {
-      const dest = path.join(process.cwd(), '/src/' + fileNames[5]);
-      if (!fs.existsSync(dest)) {
-         fs.copySync(paths[5], dest);
-      }
-   }
-
-   return Promise.resolve();
 };
 
 // *** MAIN ***
 
-// check arguments
-if (process.argv.length < 3) {
-   help();
-   process.exit(1);
-}
-
-// display help
+// check if we've been called for help
 if (process.argv.indexOf('-h') > -1 || process.argv.indexOf('--help') > -1) {
    help();
    process.exit(0);
 }
 
-// dispatch action
-switch (process.argv[2]) {
-   case 'clean': {
-      copyConfigFiles().then(() => {
-         action(cleanDist);
-      });
-      break;
-   }
-
-   case 'start': {
-      copyConfigFiles().then(() => {
-         action(buildDev);
-      });
-      break;
-   }
-
-   case 'build': {
-      cleanDist()
-         .then(copyConfigFiles)
-         .then(() => {
-            action(buildProd);
-         });
-      break;
-   }
-
-   case 'init': {
-      const opt = getopt.create([
-         ['d', 'description=ARG'],
-         ['f', 'force'],
-         ['i', 'without-npm-install'],
-         ['v', 'version=ARG']
-      ])
-         .parseSystem();
-
-      if (opt.argv.length < 2) {
-         console.error('Missing required argument: project_name');
-         break;
-      }
-
-      action(init, opt.argv[1], opt.options);
-
-      break;
-   }
-
-   case 'preversion': {
-      action(preversion);
-      break;
-   }
-
-   case 'postversion': {
-      const opt = getopt.create([['', 'without-changelog']])
-         .parseSystem();
-
-      action(postversion, opt.options['without-changelog']);
-
-      break;
-   }
-
-   default: {
-      console.error(`Invalid command: ${process.argv[1]}`);
-      help();
-      process.exit(1);
-   }
+// check if action argument is present
+if (process.argv.length < 3) {
+   console.error('Error: Missing action argument');
+   process.exit(1);
 }
+
+// find given action function
+const action = actions.find(action => action.config.name == process.argv[2]);
+
+// check if given action exists
+if (!action) {
+   console.error(`Error: Action '${process.argv[2]}' not found`);
+   process.exit(1);
+}
+
+// set up options parser
+const opt = getopt.create(action.config.options || [])
+   .parseSystem();
+
+// run action
+action(opt)
+   .then(
+      () => process.exit(0),
+      (error) => {
+         console.error(`Error: ${error.message}`);
+         process.exit(1);
+      }
+   );
