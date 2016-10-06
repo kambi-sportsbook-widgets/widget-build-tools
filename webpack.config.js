@@ -28,17 +28,12 @@ let scssLoaders = [
 ];
 
 const resolve = {
-   extensions: ['', '.js', '.json', '.scss', '.html']
-};
-
-const useRealReact = require(path.join(process.cwd(), 'package.json')).useRealReact || false; // eslint-disable-line
-
-if (!useRealReact) {
-   resolve.alias = {
+   extensions: ['', '.js', '.jsx', '.json', '.scss', '.html'],
+   alias: {
       react: 'react-lite',
       'react-dom': 'react-lite'
-   };
-}
+   }
+};
 
 if (process.env.NODE_ENV === 'production') {
    devtool = false;
@@ -68,6 +63,12 @@ if (process.env.NODE_ENV === 'production') {
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin()
    ]);
+} else {
+   const useRealReact = require(path.join(process.cwd(), 'package.json')).useRealReact || false; // eslint-disable-line
+
+   if (useRealReact) {
+      delete resolve.alias;
+   }
 }
 
 plugins = plugins.concat([
@@ -103,7 +104,7 @@ module.exports = validate({
    module: {
       preLoaders: [
          {
-            test: /src\/.*.js$/,
+            test: /src\/.*\.jsx?$/,
             exclude: [
                /node_modules/,
                /widget-core-library/,
@@ -127,6 +128,14 @@ module.exports = validate({
             loader: 'babel-loader',
             query: {
                presets: [require.resolve('babel-preset-es2015')]
+            }
+         },
+         {
+            test: /.jsx$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+            query: {
+               presets: [require.resolve('babel-preset-es2015'), require.resolve('babel-preset-react')]
             }
          },
          {

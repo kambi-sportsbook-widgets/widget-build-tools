@@ -11,7 +11,7 @@
     "fetch":true,
     "sightglass":true
   },
-  "rules":{
+  "rules": {
     "array-callback-return": 0,
     "arrow-body-style": 0,
     "arrow-spacing": 0,
@@ -63,6 +63,7 @@
     "strict": 0,
     "valid-typeof": 0,
     "vars-on-top": 0,
-    "wrap-iife": [2, "any"]
+    "wrap-iife": [2, "any"],
+    "react/jsx-indent": [2, 3]
   }
 }
