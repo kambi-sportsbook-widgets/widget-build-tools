@@ -16,7 +16,7 @@ let devtool = 'source-map';
 let plugins = [
    new webpack.DefinePlugin({
       'process.env': {
-         NODE_ENV: process.env.NODE_ENV
+         NODE_ENV: JSON.stringify(process.env.NODE_ENV)
       }
    })
 ];
@@ -58,6 +58,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 plugins = plugins.concat([
+   new webpack.HotModuleReplacementPlugin(),
    new HtmlWebpackPlugin({
       template: 'src/index.html'
    }),
@@ -77,7 +78,11 @@ module.exports = validate({
    devtool: devtool,
    plugins: plugins,
    entry: {
-      app: ['./src/index.js']
+      app: [
+         './src/index.js',
+         'webpack/hot/dev-server',
+         'webpack-dev-server/client?https://localhost:8080/'
+      ]
    },
    stats: {
       errorDetails: true,
