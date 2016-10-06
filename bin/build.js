@@ -74,8 +74,8 @@ clean.config = {
  * @returns {Promise}
  */
 const start = (opt) => {
-   console.log(chalk.cyan('Starting the development server...'));
    process.env.NODE_ENV = 'development';
+   console.log(chalk.cyan('Starting the development server...'));
 
    const port = opt.options.port || 8080;
 
@@ -131,11 +131,11 @@ start.config = {
  * @returns {Promise}
  */
 const build = () => {
+   process.env.NODE_ENV = 'production';
    return clean()
       .then(() => copyConfigFiles())
       .then(() => {
          return new Promise((resolve, reject) => {
-            process.env.NODE_ENV = 'production';
             const config = require('../webpack.config.js'); // eslint-disable-line
 
             const compiler = webpack(config);

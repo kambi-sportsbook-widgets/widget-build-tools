@@ -20,7 +20,7 @@ const init = function(opt) {
 
    // map of what needs to be copied where
    const files = {
-      'app.scss': 'src/scss/',
+      'app.scss': 'src/',
       'index.html': 'src/',
       'index.js': 'src/',
       'package.json': '',
