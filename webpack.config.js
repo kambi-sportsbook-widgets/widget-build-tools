@@ -27,6 +27,19 @@ let scssLoaders = [
    'sass-loader?sourceMap'
 ];
 
+const resolve = {
+   extensions: ['', '.js', '.json', '.scss', '.html']
+};
+
+const useRealReact = require(path.join(process.cwd(), 'package.json')).useRealReact || false; // eslint-disable-line
+
+if (!useRealReact) {
+   resolve.alias = {
+      react: 'react-lite',
+      'react-dom': 'react-lite'
+   };
+}
+
 if (process.env.NODE_ENV === 'production') {
    devtool = false;
 
@@ -141,7 +154,5 @@ module.exports = validate({
       path: path.resolve(process.cwd(), 'dist'),
       filename: '[name].js'
    },
-   resolve: {
-      extensions: ['', '.js', '.json', '.scss', '.html']
-   },
+   resolve: resolve,
 });
