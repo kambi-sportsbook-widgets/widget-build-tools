@@ -23,6 +23,7 @@ const init = function(opt) {
       'app.scss': 'src/',
       'index.html': 'src/',
       'index.js': 'src/',
+      'en_GB.json': 'src/i18n/',
       'package.json': '',
       'README.md': ''
    };
