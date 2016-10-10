@@ -35,6 +35,11 @@ const resolve = {
    }
 };
 
+const useRealReact = Object.assign(
+   { development: true, production: false },
+   require(path.join(process.cwd(), 'package.json')).useRealReact || {} // eslint-disable-line
+);
+
 if (process.env.NODE_ENV === 'production') {
    devtool = false;
 
@@ -63,10 +68,12 @@ if (process.env.NODE_ENV === 'production') {
       new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin()
    ]);
-} else {
-   const useRealReact = require(path.join(process.cwd(), 'package.json')).useRealReact || false; // eslint-disable-line
 
-   if (useRealReact) {
+   if (useRealReact.production) {
+      delete resolve.alias;
+   }
+} else {
+   if (useRealReact.development) { // eslint-disable-line
       delete resolve.alias;
    }
 }
