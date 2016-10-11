@@ -66,6 +66,7 @@
     "wrap-iife": [2, "any"],
     "react/jsx-indent": [2, 3],
     "react/jsx-no-bind": [2, {"allowBind": true}],
-    "react/forbid-prop-types": 0
+    "react/forbid-prop-types": 0,
+    "react/jsx-indent-props": [2, 3]
   }
 }
