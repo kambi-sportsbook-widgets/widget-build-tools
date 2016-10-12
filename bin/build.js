@@ -13,7 +13,6 @@ const copyConfigFiles = () => {
    const fileNames = [
       '.editorconfig',
       '.eslintrc',
-      '.scss-lint',
       'LICENSE',
       'gitignore',
       'mockSetupData.json'
