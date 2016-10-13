@@ -11,10 +11,10 @@
       "postversion": "kambi-widgets-cli postversion"
    },
    "dependencies": {
-      "widget-core-library": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-core-library.git#v3.0.0"
+      "widget-core-library": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-core-library.git#v3.1.0"
    },
    "devDependencies": {
-      "widget-build-tools": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-build-tools.git#v2.0.1"
+      "widget-build-tools": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-build-tools.git#v2.0.2"
    },
    "license": "MIT"
 }
