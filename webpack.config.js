@@ -135,16 +135,14 @@ module.exports = validate({
             loader: 'url-loader'
          },
          {
-            test: /.js$/,
-            exclude: /node_modules/,
+            test: /\.js$/,
             loader: 'babel-loader',
             query: {
                presets: [require.resolve('babel-preset-es2015')]
             }
          },
          {
-            test: /.jsx$/,
-            exclude: /node_modules/,
+            test: /\.jsx$/,
             loader: 'babel-loader',
             query: {
                presets: [require.resolve('babel-preset-es2015'), require.resolve('babel-preset-react')]
