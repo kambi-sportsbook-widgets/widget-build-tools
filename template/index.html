@@ -1,24 +1,37 @@
 <!doctype html>
 <html>
 <head>
-   <title>${projectName}</title>
-   <meta charset="UTF-8">
-   <meta name="apple-mobile-web-app-title" content="Kambi">
-   <meta name="description" content="Kambi Sportsbook Facebook widget">
-   <meta name="HandheldFriendly" content="True">
-   <meta name="MobileOptimized" content="320">
-   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-   <meta name="fragment" content="!"/>
-   <meta name="mobile-web-app-capable" content="yes">
-   <meta name="apple-mobile-web-app-capable" content="yes">
-   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-   <meta name="apple-mobile-web-app-title" content="">
+   <title>test</title>
+   <meta charset='UTF-8'>
+   <meta name='apple-mobile-web-app-title' content='Kambi'>
+   <meta name='description' content='Kambi Sportsbook Facebook widget'>
+   <meta name='HandheldFriendly' content='True'>
+   <meta name='MobileOptimized' content='320'>
+   <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui'>
+   <meta name='fragment' content='!'/>
+   <meta name='mobile-web-app-capable' content='yes'>
+   <meta name='apple-mobile-web-app-capable' content='yes'>
+   <meta name='apple-mobile-web-app-status-bar-style' content='black'>
+   <meta name='apple-mobile-web-app-title' content=''>
 </head>
-<body class="l-flexbox l-vertical">
-<header class="KambiWidget-header l-pl-12 l-flexbox l-horizontal l-align-center">
-   <div id='title'>${projectName}</div>
+<body class='l-flexbox l-vertical'>
+<header class='KambiWidget-header kw-header l-pl-12 l-flexbox l-horizontal l-align-center'>
+   <div id='title'></div>
 </header>
-<main class="l-flexbox">
+<main class='l-flexbox l-vertical'>
+   <div class="l-flexbox l-m-8 l-justify-center">
+      <span id='match-info'></span>
+   </div>
+   <div class='l-flexbox l-m-8 l-aling-center l-horizontal'>
+      <span
+         id='home-info'
+         class='l-flexbox l-m-8 l-flex-1'>
+      </span>
+      <span
+         id='away-info'
+         class='l-flexbox l-m-8 l-flex-1 l-justify-end''>
+      </span>
+   </div>
 </main>
 </body>
 </html>
