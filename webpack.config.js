@@ -27,6 +27,12 @@ let scssLoaders = [
    'sass-loader?sourceMap'
 ];
 
+let appEntry = [
+   './src/index.js',
+   'webpack/hot/dev-server',
+   'webpack-dev-server/client?https://localhost:8080/'
+];
+
 const resolve = {
    extensions: ['', '.js', '.jsx', '.json', '.scss', '.html'],
    alias: {
@@ -42,6 +48,9 @@ const useRealReact = Object.assign(
 
 if (process.env.NODE_ENV === 'production') {
    devtool = false;
+
+   // removing dev-server from entry
+   appEntry = appEntry.slice(0, 1);
 
    scssLoaders = [
       'style-loader',
@@ -99,11 +108,7 @@ module.exports = validate({
    devtool: devtool,
    plugins: plugins,
    entry: {
-      app: [
-         './src/index.js',
-         'webpack/hot/dev-server',
-         'webpack-dev-server/client?https://localhost:8080/'
-      ]
+      app: appEntry
    },
    stats: {
       errorDetails: true,
