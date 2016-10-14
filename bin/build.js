@@ -13,41 +13,42 @@ const copyConfigFiles = () => {
    const fileNames = [
       '.editorconfig',
       '.eslintrc',
-      'LICENSE',
-      'gitignore',
-      'mockSetupData.json'
    ];
    const configFolder = path.join(process.cwd(), 'node_modules/widget-build-tools/widget_config/');
    const paths = fileNames.map((p) => {
       return path.join(configFolder, p);
    });
-   for (let i = 0; i < 3; i++) {
-      if (fs.existsSync(paths[i])) {
-         fs.copySync(paths[i], path.join(process.cwd(), fileNames[i]));
+   paths.forEach((filePath, index) => {
+      if (fs.existsSync(filePath)) {
+         const fileDest = path.join(process.cwd(), fileNames[index]);
+         fs.copySync(filePath, fileDest);
       }
-   }
+   });
 
    // files with special handling
 
    // LICENSE file, we don't copy it if it is already there
-   if (fs.existsSync(paths[3])) {
-      const dest = path.join(process.cwd(), fileNames[3]);
-      if (!fs.existsSync(dest)) {
-         fs.copySync(paths[3], dest);
+   let filePath = path.join(configFolder, 'LICENSE');
+   if (fs.existsSync(filePath)) {
+      const fileDest = path.join(process.cwd(), 'LICENSE');
+      if (!fs.existsSync(fileDest)) {
+         fs.copySync(filePath, fileDest);
       }
    }
 
    // gitignore, we need to rename it to .gitignore (npm strips .gitignore)
-   if (fs.existsSync(paths[4])) {
-      const dest = path.join(process.cwd(), '.' + fileNames[4]);
-      fs.copySync(paths[4], dest);
+   filePath = path.join(configFolder, 'gitignore');
+   if (fs.existsSync(filePath)) {
+      const fileDest = path.join(process.cwd(), '.gitignore');
+      fs.copySync(filePath, fileDest);
    }
 
    // mockSetupData.json, we need to copy it to /src/ and only if it doesn't exist
-   if (fs.existsSync(paths[5])) {
-      const dest = path.join(process.cwd(), '/src/' + fileNames[5]);
-      if (!fs.existsSync(dest)) {
-         fs.copySync(paths[5], dest);
+   filePath = path.join(configFolder, 'mockSetupData.json');
+   if (fs.existsSync(filePath)) {
+      const fileDest = path.join(process.cwd(), '/src/mockSetupData.json');
+      if (!fs.existsSync(fileDest)) {
+         fs.copySync(filePath, fileDest);
       }
    }
 

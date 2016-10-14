@@ -6,7 +6,6 @@ docs
 *.map
 bower_components
 /.project
-mockSetupData.json
 /dist/
 npm-debug.log
 .DS_Store
