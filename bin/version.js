@@ -47,27 +47,28 @@ preversion.config = {
 const postversion = (opt) => {
    return Promise.all([
       exec('git push --follow-tags'),
-      fs.readJsonAsync(path.join(process.cwd(), 'package.json'))
+      fs.readJsonAsync(path.join(process.cwd(), 'package.json')),
+      repositoryURL()
    ])
-      .then((results) => {
-         if (opt.options['without-changelog']) {
-            return;
-         }
+   .then((results) => {
+      if (opt.options['without-changelog']) {
+         return;
+      }
 
-         const changelogURL = repositoryURL()
-            .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
-            .concat(`/releases/tag/v${results[1].version}`);
+      const changelogURL = results[2]
+         .replace(/^(git\+https?|git\+ssh):\/\/(.*@)?(.+?)(\.git\/?)?$/, 'https://$3')
+         .concat(`/releases/tag/v${results[1].version}`);
 
-         // GitHub needs some time to publish our commit
-         console.log('Waiting for GitHub...');
+      // GitHub needs some time to publish our commit
+      console.log('Waiting for GitHub...');
 
-         return new Promise((resolve) => {
-            setTimeout(() => {
-               opn(changelogURL);
-               resolve();
-            }, 2000);
-         });
+      return new Promise((resolve) => {
+         setTimeout(() => {
+            opn(changelogURL);
+            resolve();
+         }, 2000);
       });
+   });
 };
 
 postversion.config = {
