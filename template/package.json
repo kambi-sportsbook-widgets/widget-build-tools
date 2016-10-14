@@ -14,7 +14,7 @@
       "widget-core-library": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-core-library.git#v3.1.0"
    },
    "devDependencies": {
-      "widget-build-tools": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-build-tools.git#v2.1.2"
+      "widget-build-tools": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-build-tools.git#v2.1.3"
    },
    "license": "MIT"
 }
