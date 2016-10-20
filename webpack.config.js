@@ -122,7 +122,7 @@ module.exports = validate({
                /widget-core-library/,
                /widget-build-tools/
             ],
-            loader: `eslint-loader?{configFile:"${path.join(__dirname, '.eslintrc')}"}`
+            loader: `eslint-loader?{configFile:"${path.join(__dirname + '/widget_config', '.eslintrc')}"}`
          }
       ],
       loaders: [
