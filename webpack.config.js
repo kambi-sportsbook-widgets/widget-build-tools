@@ -127,14 +127,6 @@ module.exports = validate({
       ],
       loaders: [
          {
-            test: /\.svg/,
-            loader: 'svg-url-loader'
-         },
-         {
-            test: /(\.ttf|\.woff2?|\.eot)/,
-            loader: 'url-loader'
-         },
-         {
             test: /\.js$/,
             loader: 'babel-loader',
             query: {
@@ -151,6 +143,10 @@ module.exports = validate({
          {
             test: /\.scss$/,
             loaders: scssLoaders
+         },
+         {
+            test: /(\.png|\.jpe?g)$/,
+            loader: "url-loader"
          },
          {
             test: /\.html/,
