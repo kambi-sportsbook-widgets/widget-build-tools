@@ -7,7 +7,7 @@ Generalized build lifecycle for Kambi widgets.
 ```
 npm install require-dir
 
-npm install --save git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git
+npm install widget-build-tools
 
 ```
 
