@@ -2,7 +2,7 @@ import {
    coreLibrary,
    widgetModule,
    offeringModule
-} from 'widget-core-library';
+} from 'kambi-widget-core-library';
 import './index.html';
 import './app.scss';
 
