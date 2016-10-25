@@ -14,7 +14,7 @@ const copyConfigFiles = () => {
       '.editorconfig',
       '.eslintrc',
    ];
-   const configFolder = path.join(process.cwd(), 'node_modules/widget-build-tools/widget_config/');
+   const configFolder = path.join(process.cwd(), 'node_modules/kambi-widget-build-tools/widget_config/');
    const paths = fileNames.map((p) => {
       return path.join(configFolder, p);
    });

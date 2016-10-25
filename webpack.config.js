@@ -119,8 +119,8 @@ module.exports = validate({
             test: /src\/.*\.jsx?$/,
             exclude: [
                /node_modules/,
-               /widget-core-library/,
-               /widget-build-tools/
+               /kambi-widget-core-library/,
+               /kambi-widget-build-tools/
             ],
             loader: `eslint-loader?{configFile:"${path.join(__dirname + '/widget_config', '.eslintrc')}"}`
          }
