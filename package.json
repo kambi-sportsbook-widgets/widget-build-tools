@@ -1,5 +1,5 @@
 {
-  "name": "widget-build-tools",
+  "name": "kambi-widget-build-tools",
   "version": "2.2.2",
   "description": "Build tools shared between the widgets",
   "bin": {
