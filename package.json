@@ -5,6 +5,9 @@
   "bin": {
     "kambi-widgets-cli": "./bin/cli.js"
   },
+  "scripts": {
+    "postversion": "npm publish"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git"
