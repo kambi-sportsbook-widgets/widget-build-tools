@@ -23,7 +23,7 @@ let plugins = [
 
 let scssLoaders = [
    'style-loader',
-   'css-loader?sourceMap',
+   'css-loader?sourceMap&localIdentName=[name]__[local]___[hash:base64:5]',
    'sass-loader?sourceMap'
 ];
 
@@ -85,6 +85,10 @@ if (process.env.NODE_ENV === 'production') {
    if (useRealReact.development) { // eslint-disable-line
       delete resolve.alias;
    }
+}
+
+if (module.hot) {
+   module.hot.accept();
 }
 
 plugins = plugins.concat([
@@ -166,6 +170,7 @@ module.exports = validate({
          )
    },
    output: {
+      publicPath: "https://localhost:8080/",
       path: path.resolve(process.cwd(), 'dist'),
       filename: '[name].js'
    },
