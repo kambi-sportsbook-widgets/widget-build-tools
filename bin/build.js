@@ -1,8 +1,10 @@
-const chalk = require('chalk'),
-   fs = require('fs-extra-promise'),
-   path = require('path'),
-   webpack = require('webpack'),
-   WebpackDevServer = require('webpack-dev-server');
+const chalk = require('chalk');
+const fs = require('fs-extra-promise');
+const path = require('path');
+const webpack = require('webpack');
+const WebpackDevServer = require('webpack-dev-server');
+const Dashboard = require('webpack-dashboard');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 
 /**
  * Copies config files to the widget folder
@@ -81,7 +83,9 @@ const start = (opt) => {
 
    return copyConfigFiles()
       .then(() => {
+         const dashboard = new Dashboard();
          const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
+         compiler.apply(new DashboardPlugin(dashboard.setData));
          const devServer = new WebpackDevServer(compiler, {
             hot: true,
             debug: true,

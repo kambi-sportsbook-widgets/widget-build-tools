@@ -18,7 +18,7 @@ let plugins = [
       'process.env': {
          NODE_ENV: JSON.stringify(process.env.NODE_ENV)
       }
-   })
+   }),
 ];
 
 let scssLoaders = [
@@ -87,9 +87,11 @@ if (process.env.NODE_ENV === 'production') {
    }
 }
 
+/*
 if (module.hot) {
    module.hot.accept();
 }
+*/
 
 plugins = plugins.concat([
    new webpack.HotModuleReplacementPlugin(),
