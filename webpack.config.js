@@ -170,7 +170,6 @@ module.exports = validate({
          )
    },
    output: {
-      publicPath: "https://localhost:8080/",
       path: path.resolve(process.cwd(), 'dist'),
       filename: '[name].js'
    },
