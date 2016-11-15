@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === 'production') {
 
    scssLoaders = [
       'style-loader',
-      'css-loader',
+      'css-loader?-autoprefixer',
       'sass-loader'
    ];
 
