@@ -1,0 +1,6 @@
+{
+  "name": "kambi-html-injector",
+  "description": "loader that injects Widget API scripts and CSS tags to the head section of the HTML file provided",
+  "main": "index.js",
+  "version": "1.0.0"
+}

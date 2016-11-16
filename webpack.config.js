@@ -3,6 +3,7 @@ const validate = require('webpack-validator');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
 const fs = require('fs');
 
 if (process.env.NODE_ENV !== 'production'
@@ -119,6 +120,11 @@ module.exports = validate({
    },
    module: {
       preLoaders: [
+         {
+            test: /src\/index\.html/,
+            exclude: [/node_modules/],
+            loader: `kambi-html-injector?widgetApiVersion=${constants.widgetApiVersion}`
+         },
          {
             test: /src\/.*\.jsx?$/,
             exclude: [
