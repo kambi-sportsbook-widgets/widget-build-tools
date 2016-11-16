@@ -123,7 +123,9 @@ module.exports = validate({
          {
             test: /src\/index\.html/,
             exclude: [/node_modules/],
-            loader: `kambi-html-injector?widgetApiVersion=${constants.widgetApiVersion}`
+            // this loader is defined in kambi-wapi-html-loader.js and injects the Widget API script in the page
+            // it needs to use absolute path here because webpack require()s it in different places (the alternative would be creating a project just for the loader)
+            loader: `${process.cwd()}/node_modules/kambi-widget-build-tools/kambi-wapi-html-loader?widgetApiVersion=${constants.widgetApiVersion}`
          },
          {
             test: /src\/.*\.jsx?$/,
@@ -156,7 +158,7 @@ module.exports = validate({
          },
          {
             test: /(\.png|\.jpe?g)$/,
-            loader: "url-loader"
+            loader: 'url-loader'
          },
          {
             test: /\.html/,

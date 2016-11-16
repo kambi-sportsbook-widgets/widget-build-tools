@@ -43,7 +43,6 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1",
-    "webpack-validator": "^2.2.7",
-    "kambi-html-injector": "file:./kambi-html-injector"
+    "webpack-validator": "^2.2.7"
   }
 }
