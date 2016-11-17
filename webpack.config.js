@@ -5,8 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 
-if (process.env.NODE_ENV !== 'production'
-      && process.env.NODE_ENV !== 'development') {
+if ( process.env.NODE_ENV !== 'production'
+   && process.env.NODE_ENV !== 'development' ) {
    throw new Error('Environment variable NODE_ENV not set, please set it to either "production or "development"')
 }
 
@@ -24,6 +24,7 @@ let plugins = [
 let scssLoaders = [
    'style-loader',
    'css-loader?sourceMap&localIdentName=[name]__[local]___[hash:base64:5]',
+   'postcss-loader?sourceMap',
    'sass-loader?sourceMap'
 ];
 
@@ -46,7 +47,7 @@ const useRealReact = Object.assign(
    require(path.join(process.cwd(), 'package.json')).useRealReact || {} // eslint-disable-line
 );
 
-if (process.env.NODE_ENV === 'production') {
+if ( process.env.NODE_ENV === 'production' ) {
    devtool = false;
 
    // removing dev-server from entry
@@ -55,6 +56,7 @@ if (process.env.NODE_ENV === 'production') {
    scssLoaders = [
       'style-loader',
       'css-loader?-autoprefixer',
+      'postcss-loader',
       'sass-loader'
    ];
 
@@ -78,16 +80,16 @@ if (process.env.NODE_ENV === 'production') {
       new webpack.optimize.AggressiveMergingPlugin()
    ]);
 
-   if (useRealReact.production) {
+   if ( useRealReact.production ) {
       delete resolve.alias;
    }
 } else {
-   if (useRealReact.development) { // eslint-disable-line
+   if ( useRealReact.development ) { // eslint-disable-line
       delete resolve.alias;
    }
 }
 
-if (module.hot) {
+if ( module.hot ) {
    module.hot.accept();
 }
 
@@ -165,8 +167,8 @@ module.exports = validate({
    resolveLoader: {
       root: fs.existsSync(
          path.join(__dirname, 'node_modules')) ?
-            path.join(__dirname, 'node_modules') :
-            path.join(process.cwd(), 'node_modules'
+         path.join(__dirname, 'node_modules') :
+         path.join(process.cwd(), 'node_modules'
          )
    },
    output: {

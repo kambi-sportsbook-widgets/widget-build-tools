@@ -13,6 +13,7 @@ const copyConfigFiles = () => {
    const fileNames = [
       '.editorconfig',
       '.eslintrc',
+      'postcss.config.js'
    ];
    const configFolder = path.join(process.cwd(), 'node_modules/kambi-widget-build-tools/widget_config/');
    const paths = fileNames.map((p) => {
