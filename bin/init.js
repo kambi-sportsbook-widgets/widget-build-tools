@@ -65,6 +65,22 @@ const init = function(opt) {
          );
       })
 
+      // set the build-tools and core-library versions to the newest versions in package.json
+      .then(() => {
+         const p1 = exec('npm show kambi-widget-build-tools version');
+         const p2 = exec('npm show kambi-widget-core-library version');
+         const p3 = fs.readFileAsync(path.join(projectName, 'package.json'));
+         return Promise.all([p1, p2, p3]).then((data) => {
+            // removing \n at the end of the versions
+            const buildToolsVersion = data[0].replace('\n', '');
+            const coreLibraryVersion = data[1].replace('\n', '');
+            const packageJson = JSON.parse(data[2]);
+            packageJson.devDependencies['kambi-widget-build-tools'] = '^' + buildToolsVersion;
+            packageJson.dependencies['kambi-widget-core-library'] = '^' + coreLibraryVersion;
+            return fs.writeFileAsync(path.join(projectName, 'package.json'), JSON.stringify(packageJson, null, 3));
+         })
+      })
+
       // run npm install
       .then(() => {
          if (opt.options['without-npm-install']) {
