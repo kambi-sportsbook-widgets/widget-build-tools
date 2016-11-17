@@ -3,6 +3,7 @@ const validate = require('webpack-validator');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
 const fs = require('fs');
 
 if ( process.env.NODE_ENV !== 'production'
@@ -122,6 +123,13 @@ module.exports = validate({
    module: {
       preLoaders: [
          {
+            test: /src\/index\.html/,
+            exclude: [/node_modules/],
+            // this loader is defined in kambi-wapi-html-loader.js and injects the Widget API script in the page
+            // it needs to use absolute path here because webpack require()s it in different places (the alternative would be creating a project just for the loader)
+            loader: `${process.cwd()}/node_modules/kambi-widget-build-tools/kambi-wapi-html-loader?widgetApiVersion=${constants.widgetApiVersion}`
+         },
+         {
             test: /src\/.*\.jsx?$/,
             exclude: [
                /node_modules/,
@@ -152,7 +160,7 @@ module.exports = validate({
          },
          {
             test: /(\.png|\.jpe?g)$/,
-            loader: "url-loader"
+            loader: 'url-loader'
          },
          {
             test: /\.html/,

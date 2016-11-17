@@ -11,10 +11,10 @@
       "postversion": "kambi-widgets-cli postversion"
    },
    "dependencies": {
-      "kambi-widget-core-library": "^3.1.0"
+      "kambi-widget-core-library": ""
    },
    "devDependencies": {
-      "kambi-widget-build-tools": "^2.2.3"
+      "kambi-widget-build-tools": ""
    },
    "license": "MIT"
 }

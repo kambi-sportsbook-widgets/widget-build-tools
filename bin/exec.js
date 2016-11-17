@@ -19,7 +19,7 @@ const exec = (cmd, options) => {
          process.stdout.write(stdout);
          process.stderr.write(stderr);
 
-         resolve();
+         resolve(stdout);
       });
    });
 };
