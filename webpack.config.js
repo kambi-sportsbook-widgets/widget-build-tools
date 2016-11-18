@@ -3,7 +3,6 @@ const validate = require('webpack-validator');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
 const fs = require('fs');
 
 if ( process.env.NODE_ENV !== 'production'
@@ -123,11 +122,11 @@ module.exports = validate({
    module: {
       preLoaders: [
          {
+            // this loader includes the script tag for the Kambi API file, it is defined in kambi-wapi-html-loader.js file in the root folder of this project
             test: /src\/index\.html/,
             exclude: [/node_modules/],
-            // this loader is defined in kambi-wapi-html-loader.js and injects the Widget API script in the page
-            // it needs to use absolute path here because webpack require()s it in different places (the alternative would be creating a project just for the loader)
-            loader: `${process.cwd()}/node_modules/kambi-widget-build-tools/kambi-wapi-html-loader?widgetApiVersion=${constants.widgetApiVersion}`
+            // resolveLoader.alias maps this name to that file:
+            loader: `kambi-wapi-html-loader`
          },
          {
             test: /src\/.*\.jsx?$/,
@@ -177,7 +176,10 @@ module.exports = validate({
          path.join(__dirname, 'node_modules')) ?
          path.join(__dirname, 'node_modules') :
          path.join(process.cwd(), 'node_modules'
-         )
+      ),
+      alias: {
+         'kambi-wapi-html-loader': path.join(__dirname, 'kambi-wapi-html-loader.js')
+      }
    },
    output: {
       path: path.resolve(process.cwd(), 'dist'),
