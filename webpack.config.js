@@ -4,6 +4,8 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
+const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
+
 
 if ( process.env.NODE_ENV !== 'production'
    && process.env.NODE_ENV !== 'development' ) {
@@ -126,7 +128,7 @@ module.exports = validate({
             test: /src\/index\.html/,
             exclude: [/node_modules/],
             // resolveLoader.alias maps this name to that file:
-            loader: `kambi-wapi-html-loader`
+            loader: `widget-api-webpack-loader?widgetApiVersion=${constants.widgetApiVersion}`
          },
          {
             test: /src\/.*\.jsx?$/,
@@ -178,7 +180,7 @@ module.exports = validate({
          path.join(process.cwd(), 'node_modules'
       ),
       alias: {
-         'kambi-wapi-html-loader': path.join(__dirname, 'kambi-wapi-html-loader.js')
+         'kambi-wapi-html-loader': path.join(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'wapi-html-loader')
       }
    },
    output: {
