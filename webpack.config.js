@@ -4,12 +4,10 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
-const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
-
 
 if ( process.env.NODE_ENV !== 'production'
    && process.env.NODE_ENV !== 'development' ) {
-   throw new Error('Environment variable NODE_ENV not set, please set it to either "production or "development"')
+   throw new Error('Environment variable NODE_ENV not set, please set it to either "production" or "development"')
 }
 
 
@@ -124,14 +122,14 @@ module.exports = validate({
    module: {
       preLoaders: [
          {
-            // this loader includes the script tag for the Kambi API file, it is defined in kambi-wapi-html-loader.js file in the root folder of this project
-            test: /src\/index\.html/,
+            // this loader includes the script tag for the Kambi API file
+            test: /src(\/|\\)index\.html/,
             exclude: [/node_modules/],
-            // resolveLoader.alias maps this name to that file:
-            loader: `widget-api-webpack-loader?widgetApiVersion=${constants.widgetApiVersion}`
+            // resolveLoader.alias maps this name to the script
+            loader: `widget-api-webpack-loader`
          },
          {
-            test: /src\/.*\.jsx?$/,
+            test: /src(\/|\\).*\.jsx?$/,
             exclude: [
                /node_modules/,
                /kambi-widget-core-library/,
@@ -180,7 +178,7 @@ module.exports = validate({
          path.join(process.cwd(), 'node_modules'
       ),
       alias: {
-         'kambi-wapi-html-loader': path.join(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'wapi-html-loader')
+         'widget-api-webpack-loader': path.join(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'widget-api-webpack-loader')
       }
    },
    output: {

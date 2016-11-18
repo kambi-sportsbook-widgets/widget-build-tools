@@ -45,7 +45,6 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.16.1",
-    "webpack-validator": "^2.2.7",
-    "kambi-widget-api-webpack-loader": "git+ssh://git@github.com/kambi-sportsbook-widgets/widget-api-webpack-loader.git#master"
+    "webpack-validator": "^2.2.7"
   }
 }
