@@ -3,10 +3,8 @@
 const path = require('path');
 const constants = require(path.join(process.cwd(), 'node_modules/kambi-widget-core-library/src/constants'));
 
-console.log('bbb');
 module.exports = function(source) {
    this.cacheable(true);
-   console.log('aaa');
    const version = constants.widgetApiVersion;
    var replacement = `
 <head>
