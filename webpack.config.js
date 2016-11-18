@@ -119,6 +119,9 @@ module.exports = validate({
    stats: {
       errorDetails: true,
    },
+   eslint: {
+      configFile: path.join(__dirname + '/widget_config', '.eslintrc')
+   },
    module: {
       preLoaders: [
          {
@@ -135,7 +138,7 @@ module.exports = validate({
                /kambi-widget-core-library/,
                /kambi-widget-build-tools/
             ],
-            loader: `eslint-loader?{configFile:"${path.join(__dirname + '/widget_config', '.eslintrc')}"}`
+            loader: 'eslint-loader'
          }
       ],
       loaders: [
