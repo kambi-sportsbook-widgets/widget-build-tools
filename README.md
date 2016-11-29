@@ -7,4 +7,4 @@ npm install kambi-widget-build-tools
 
 ### Instructions
 
-Please refer to the [core-library documentation](https://github.com/kambi-sportsbook-widgets/widget-core-library) for more info 
+Please refer to the [core-library documentation](http://kambi-sportsbook-widgets.github.io/widget-core-library/tutorial-1%20-%20Introduction.html) for more info 
