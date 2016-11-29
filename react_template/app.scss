@@ -1,0 +1,35 @@
+@import '~compass-mixins';
+@import '~kambi-widget-core-library/src/scss/core.scss';
+
+// Our webpack configuration uses autoprefixer (https://github.com/postcss/autoprefixer) so we don't need to worry about vendor specific prefixes
+
+.eventContainer {
+   display: flex;
+   flex-direction: column;
+}
+
+.outcomesContainer {
+   display: flex;
+   flex-flow: row wrap;
+   justify-content: space-around;
+}
+
+.outcomeContainer {
+   display: flex;
+   flex-basis: auto;
+   padding: 3px 5px;
+   flex-grow: 1;
+}
+
+.participants {
+   text-align: center;
+   cursor: pointer;
+}
+
+.participants-font-size {
+   font-size: large;
+}
+
+.betoffer-label {
+   text-align: center;
+}

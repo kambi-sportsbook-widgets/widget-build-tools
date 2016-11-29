@@ -1,0 +1,25 @@
+{
+   "height": 0,
+   "arguments": {
+      "eventId": null
+   },
+   "pageInfo": {
+      "pageType": "home",
+      "pageParam": "",
+      "pageTrackingPath": "/home{layout_wide}"
+   },
+   "clientConfig": {
+      "market": "kambi",
+      "locale": "en_GB",
+      "currency": "EUR",
+      "channelId": 1,
+      "streamingAllowedForPlayer": true,
+      "oddsFormat": "decimal",
+      "apiBaseUrl": "https://e1-api.kambi.com/offering/api/{apiVersion}/",
+      "device": "desktop",
+      "auth": false,
+      "routeRoot": "",
+      "offering": "kambi",
+      "customer": "kambi"
+   }
+}

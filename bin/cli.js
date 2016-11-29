@@ -4,6 +4,7 @@ const getopt = require('node-getopt');
 
 // construct actions array
 const actions = require('./init')
+   .concat(require('./init-react'))
    .concat(require('./build'))
    .concat(require('./version'));
 
