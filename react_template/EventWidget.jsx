@@ -57,7 +57,7 @@ class EventWidget extends React.Component {
             <Participants
                homeName={this.props.event.event.homeName}
                awayName={this.props.event.event.awayName}
-               onClick={widgetModule.navigateToEvent.bind(this.props.event)}
+               onClick={navigateToEvent.bind(null, this.props.event)}
             />
             <BetOffers
                betOffers={this.props.event.betOffers}
