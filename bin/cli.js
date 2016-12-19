@@ -72,7 +72,7 @@ action(opt)
    .then(
       () => process.exit(0),
       (error) => {
-         console.error(`Error: ${error.message}`);
+         process.stderr.write(`Error: ${error.message}`);
          process.exit(1);
       }
    );

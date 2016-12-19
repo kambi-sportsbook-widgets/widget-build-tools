@@ -140,17 +140,17 @@ const build = () => {
             const config = require('../webpack.config.js'); // eslint-disable-line
 
             const compiler = webpack(config);
+
             compiler.run((err, stats) => {
                if (err) {
-                  console.error(err);
-                  reject();
+                  reject(err);
                   return;
                }
 
-               process.stdout.write(stats.toString(Object.assign(config, { colors: true })) + '\n');
+               process.stdout.write(stats.toString({ colors: true, errors: false }) + '\n');
 
                if (stats.compilation.errors.length > 0) {
-                  reject();
+                  reject(new Error('Exiting due to compilation errors:\n\n' + stats.compilation.errors.join('\n')));
                   return;
                }
 
