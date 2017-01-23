@@ -1,5 +1,4 @@
 const path = require('path');
-const validate = require('webpack-validator');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -9,7 +8,6 @@ if ( process.env.NODE_ENV !== 'production'
    && process.env.NODE_ENV !== 'development' ) {
    throw new Error('Environment variable NODE_ENV not set, please set it to either "production" or "development"')
 }
-
 
 let devtool = 'source-map';
 
@@ -35,16 +33,18 @@ let appEntry = [
 ];
 
 const resolve = {
-   extensions: ['', '.js', '.jsx', '.json', '.scss', '.html'],
+   extensions: ['.js', '.jsx', '.json', '.scss', '.html'],
    alias: {
-      react: 'react-lite',
-      'react-dom': 'react-lite'
-   }
+      react: 'react-lite', 'react-dom': 'react-lite'
+   },
+   modules: [ path.resolve(__dirname, 'node_modules') ?
+              path.resolve(__dirname, 'node_modules') :
+              path.resolve(process.cwd(), 'node_modules')]
 };
 
 const useRealReact = Object.assign(
    { development: true, production: false },
-   require(path.join(process.cwd(), 'package.json')).useRealReact || {} // eslint-disable-line
+   require(path.resolve(process.cwd(), 'package.json')).useRealReact || {} // eslint-disable-line
 );
 
 if ( process.env.NODE_ENV === 'production' ) {
@@ -76,7 +76,6 @@ if ( process.env.NODE_ENV === 'production' ) {
             screw_ie8: true
          }
       }),
-      new webpack.optimize.OccurrenceOrderPlugin(),
       new webpack.optimize.AggressiveMergingPlugin()
    ]);
 
@@ -110,7 +109,7 @@ plugins = plugins.concat([
    ])
 ]);
 
-module.exports = validate({
+module.exports = {
    devtool: devtool,
    plugins: plugins,
    entry: {
@@ -119,17 +118,21 @@ module.exports = validate({
    stats: {
       errorDetails: true,
    },
-   eslint: {
-      configFile: path.join(__dirname + '/widget_config', '.eslintrc')
-   },
+   /*eslint: {
+      configFile: path.resolve(__dirname + '/widget_config', '.eslintrc')
+   },*/
    module: {
-      preLoaders: [
+      rules: [
          {
             // this loader includes the script tag for the Kambi API file
             test: /src(\/|\\)index\.html/,
-            exclude: [/node_modules/],
+            exclude: [
+               path.resolve(__dirname, '/node_modules/')
+            ],
             // resolveLoader.alias maps this name to the script
-            loader: `widget-api-webpack-loader`
+            use: {
+              loader: 'widget-api-webpack-loader'
+            }
          },
          {
             test: /src(\/|\\).*\.jsx?$/,
@@ -138,50 +141,57 @@ module.exports = validate({
                /kambi-widget-core-library/,
                /kambi-widget-build-tools/
             ],
-            loader: 'eslint-loader'
-         }
-      ],
-      loaders: [
+            use: {
+               loader: 'eslint-loader'
+            }
+         },
          {
             test: /\.js$/,
-            loader: 'babel-loader',
-            query: {
-               presets: [require.resolve('babel-preset-es2015')]
-            }
+            use: {
+               loader: 'babel-loader',
+               options: {
+                  presets: ['babel-preset-es2015']
+               }
+            },
          },
          {
             test: /\.jsx$/,
-            loader: 'babel-loader',
-            query: {
-               presets: [require.resolve('babel-preset-es2015'), require.resolve('babel-preset-react')]
-            }
+            use: {
+               loader: 'babel-loader',
+               options: {
+                  presets: ['babel-preset-es2015', 'babel-preset-react']
+               }
+            },
          },
          {
             test: /\.scss$/,
-            loaders: scssLoaders
+            use: [
+               'style-loader',
+               'css-loader?sourceMap&localIdentName=[name]__[local]___[hash:base64:5]',
+               'postcss-loader?sourceMap',
+               'sass-loader?sourceMap'
+            ]
          },
          {
             test: /(\.png|\.jpe?g)$/,
-            loader: 'url-loader'
+            use: 'url-loader'
          },
          {
-            test: /\.html/,
-            loader: 'html-loader'
+            test: /\.html$/,
+            exclude: /node_modules/,
+            use: {
+               loader: 'file-loader',
+               /*options: {
+                  name: '[name].[ext]'
+               }*/
+            },
          },
-         {
-            test: /\.json$/,
-            loader: 'json-loader'
-         }
       ]
    },
    resolveLoader: {
-      root: fs.existsSync(
-         path.join(__dirname, 'node_modules')) ?
-         path.join(__dirname, 'node_modules') :
-         path.join(process.cwd(), 'node_modules'
-      ),
+      symlinks: true,
       alias: {
-         'widget-api-webpack-loader': path.join(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'widget-api-webpack-loader')
+         'widget-api-webpack-loader': path.resolve(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'widget-api-webpack-loader')
       }
    },
    output: {
@@ -189,4 +199,4 @@ module.exports = validate({
       filename: '[name].js'
    },
    resolve: resolve,
-});
+};

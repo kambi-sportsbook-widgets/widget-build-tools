@@ -11,4 +11,4 @@ module.exports = function(source) {
    <script src="https://c3-static.kambi.com/sb-mobileclient/widget-api/${version}/kambi-widget-api.js"></script>
 `;
    return source.replace('<head>', replacement);
-}
+};
