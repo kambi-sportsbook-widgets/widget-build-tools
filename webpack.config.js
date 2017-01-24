@@ -4,8 +4,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const fs = require('fs');
 
-if ( process.env.NODE_ENV !== 'production'
-   && process.env.NODE_ENV !== 'development' ) {
+if (process.env.NODE_ENV !== 'production'
+   && process.env.NODE_ENV !== 'development') {
    throw new Error('Environment variable NODE_ENV not set, please set it to either "production" or "development"')
 }
 
@@ -35,11 +35,13 @@ let appEntry = [
 const resolve = {
    extensions: ['.js', '.jsx', '.json', '.scss', '.html'],
    alias: {
-      react: 'react-lite', 'react-dom': 'react-lite'
+      'react': 'react-lite',
+      'react-dom': 'react-lite'
    },
-   modules: [ path.resolve(__dirname, 'node_modules') ?
-              path.resolve(__dirname, 'node_modules') :
-              path.resolve(process.cwd(), 'node_modules')]
+   modules: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(process.cwd(), 'node_modules')
+   ]
 };
 
 const useRealReact = Object.assign(
@@ -47,7 +49,7 @@ const useRealReact = Object.assign(
    require(path.resolve(process.cwd(), 'package.json')).useRealReact || {} // eslint-disable-line
 );
 
-if ( process.env.NODE_ENV === 'production' ) {
+if (process.env.NODE_ENV === 'production') {
    devtool = false;
 
    // removing dev-server from entry
@@ -79,16 +81,16 @@ if ( process.env.NODE_ENV === 'production' ) {
       new webpack.optimize.AggressiveMergingPlugin()
    ]);
 
-   if ( useRealReact.production ) {
+   if (useRealReact.production) {
       delete resolve.alias;
    }
 } else {
-   if ( useRealReact.development ) { // eslint-disable-line
+   if (useRealReact.development) { // eslint-disable-line
       delete resolve.alias;
    }
 }
 
-if ( module.hot ) {
+if (module.hot) {
    module.hot.accept();
 }
 
@@ -118,31 +120,17 @@ module.exports = {
    stats: {
       errorDetails: true,
    },
-   /*eslint: {
-      configFile: path.resolve(__dirname + '/widget_config', '.eslintrc')
-   },*/
    module: {
       rules: [
          {
             // this loader includes the script tag for the Kambi API file
             test: /src(\/|\\)index\.html/,
             exclude: [
-               path.resolve(__dirname, '/node_modules/')
+               path.resolve(process.cwd(), '/node_modules/')
             ],
             // resolveLoader.alias maps this name to the script
             use: {
-              loader: 'widget-api-webpack-loader'
-            }
-         },
-         {
-            test: /src(\/|\\).*\.jsx?$/,
-            exclude: [
-               /node_modules/,
-               /kambi-widget-core-library/,
-               /kambi-widget-build-tools/
-            ],
-            use: {
-               loader: 'eslint-loader'
+               loader: 'widget-api-webpack-loader'
             }
          },
          {
@@ -182,8 +170,8 @@ module.exports = {
             use: {
                loader: 'file-loader',
                /*options: {
-                  name: '[name].[ext]'
-               }*/
+                name: '[name].[ext]'
+                }*/
             },
          },
       ]
