@@ -9,7 +9,7 @@ const chalk = require('chalk'),
 const test = ({ options }) => {
    const buildToolsPath = path.resolve(__dirname, '../');
    const subjectPath = process.cwd();
-   const cliPath = path.resolve(buildToolsPath, 'node_modules/.bin/jest');
+   const cliPath = 'npm';
 
    const config = {
       moduleDirectories: [
@@ -17,10 +17,10 @@ const test = ({ options }) => {
          path.resolve(buildToolsPath, 'node_modules')
       ],
       moduleNameMapper: {
-         [ '\\.(s?css|less)$' ]: "identity-obj-proxy"
+         [ '\\\\.(s?css|less)$' ]: "identity-obj-proxy"
       },
       rootDir: subjectPath,
-      testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.jsx?$',
+      testRegex: '(/tests/.*|(\\\\.|/)(test|spec))\\\\.jsx?$',
       transform: {
          ['.jsx?']: path.resolve(buildToolsPath, './jest/transform.js')
       },
@@ -29,7 +29,7 @@ const test = ({ options }) => {
       ]
    };
 
-   const params = [ `--config=${JSON.stringify(config)}`, '--colors' ];
+   const params = [ 'run', 'jest', '--', `--config=${JSON.stringify(config)}`, '--colors' ];
 
    if (options.updateSnapshot) {
       params.push('-u');
