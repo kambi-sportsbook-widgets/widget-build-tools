@@ -67,8 +67,8 @@ const init = function(opt) {
 
       // set the build-tools and core-library versions to the newest versions in package.json
       .then(() => {
-         const p1 = exec('npm show kambi-widget-build-tools version');
-         const p2 = exec('npm show kambi-widget-core-library version');
+         const p1 = exec('npm', [ 'show', 'kambi-widget-build-tools', 'version' ]);
+         const p2 = exec('npm', [ 'show', 'kambi-widget-core-library', 'version' ]);
          const p3 = fs.readFileAsync(path.join(projectName, 'package.json'));
          return Promise.all([p1, p2, p3]).then((data) => {
             // removing \n at the end of the versions
@@ -87,7 +87,7 @@ const init = function(opt) {
             return Promise.resolve();
          }
 
-         return exec('npm install', { cwd: path.join(process.cwd(), projectName) });
+         return exec('npm', [ 'install' ], { cwd: path.join(process.cwd(), projectName) });
       });
 };
 

@@ -31,7 +31,7 @@ const repositoryURL = () => {
  * @returns {Promise}
  */
 const preversion = () => {
-   return exec('git reset HEAD');
+   return exec('git', [ 'reset', 'HEAD' ]);
 };
 
 preversion.config = {
@@ -46,7 +46,7 @@ preversion.config = {
  */
 const postversion = (opt) => {
    return Promise.all([
-      exec('git push --follow-tags'),
+      exec('git', [ 'push', '--follow-tags' ]),
       fs.readJsonAsync(path.join(process.cwd(), 'package.json')),
       repositoryURL()
    ])

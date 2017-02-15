@@ -6,7 +6,8 @@ const getopt = require('node-getopt');
 const actions = require('./init')
    .concat(require('./init-react'))
    .concat(require('./build'))
-   .concat(require('./version'));
+   .concat(require('./version'))
+   .concat(require('./test'));
 
 /**
  * Displays help message.

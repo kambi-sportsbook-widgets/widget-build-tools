@@ -3,23 +3,26 @@ const childProcess = require('child_process');
 /**
  * Executes given command. Prints results to stdout/stderr.
  * @param {string} cmd Command to be executed
+ * @param {string[]} params Command parameters array
  * @param {object} [options] Options object
  * @returns {Promise}
  */
-const exec = (cmd, options) => {
+const exec = (cmd, params, options) => {
    return new Promise((resolve, reject) => {
-      console.log(`> ${cmd}`);
+      console.log(`> ${cmd} ${params.join(' ')}`);
 
-      childProcess.exec(cmd, options, (error, stdout, stderr) => {
-         if (error) {
-            reject(error);
-            return;
+      const child = childProcess.spawn(cmd, params, options);
+
+      child.stdout.on('data', (data) => process.stdout.write(data));
+
+      child.stderr.on('data', (data) => process.stderr.write(data));
+
+      child.on('close', (code) => {
+         if (code == 0) {
+            resolve();
+         } else {
+            reject(new Error(`Process exited with code ${code}\n`));
          }
-
-         process.stdout.write(stdout);
-         process.stderr.write(stderr);
-
-         resolve(stdout);
       });
    });
 };
