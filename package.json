@@ -1,13 +1,13 @@
 {
   "name": "kambi-widget-build-tools",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "Build tools shared between the widgets",
   "bin": {
     "kambi-widgets-cli": "./bin/cli.js"
   },
   "scripts": {
-     "postversion": "npm publish",
-     "jest": "jest"
+    "postversion": "npm publish",
+    "jest": "jest"
   },
   "repository": {
     "type": "git",
