@@ -1,9 +1,8 @@
-const babelJest = require('babel-jest'),
-   path = require('path');
+const babelJest = require('babel-jest');
 
-const transformer = babelJest.createTransformer({presets: [
-   'babel-preset-es2015',
-   'babel-preset-react'
-]});
-
-module.exports = transformer;
+module.exports = babelJest.createTransformer({
+   presets: [
+      'babel-preset-es2015',
+      'babel-preset-react'
+   ]
+});
