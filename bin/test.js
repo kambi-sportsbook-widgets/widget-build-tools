@@ -46,7 +46,8 @@ test.config = {
    name: 'test',
    description: 'Runs test suite',
    options: [
-      ['u', 'updateSnapshot', 'Update snapshots'],
+      ['', 'coverage', 'Indicates that test coverage information should be collected and reported in the output.'],
+      ['u', 'updateSnapshot', 'Use this flag to re-record snapshots.'],
       ['', 'verbose', 'Display individual test results with the test suite hierarchy']
    ]
 };
