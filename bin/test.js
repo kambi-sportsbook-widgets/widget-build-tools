@@ -22,10 +22,10 @@ const test = ({ options }) => {
       rootDir: subjectPath,
       testRegex: '(/tests/.*|(\\\\.|/)(test|spec))\\\\.jsx?$',
       transform: {
-         ['.jsx?']: path.resolve(buildToolsPath, './jest/transform.js')
+         ['\\\\.jsx?']: path.resolve(buildToolsPath, './jest/transform.js')
       },
       transformIgnorePatterns: [
-         '/node_modules/(?!kambi-widget-core-library)'
+         '/node_modules/(?!kambi-widget-core-library)(?!kambi-widget-components)'
       ]
    };
 
