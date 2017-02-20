@@ -29,7 +29,7 @@ const test = ({ options }) => {
       ]
    };
 
-   const params = [ 'run', 'jest', '--', `--config=${JSON.stringify(config)}`, '--colors' ];
+   const params = [ 'run', 'jest', '--', '--colors' ];
 
    if (options.updateSnapshot) {
       params.push('-u');
@@ -38,6 +38,13 @@ const test = ({ options }) => {
    if (options.verbose) {
       params.push('--verbose');
    }
+
+   if (options.coverage) {
+      params.push('--coverage');
+      config.coverageDirectory = path.resolve(subjectPath, 'coverage');
+   }
+
+   params.push(`--config=${JSON.stringify(config)}`);
 
    return exec(cliPath, params, { cwd: buildToolsPath });
 };
