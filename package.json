@@ -6,8 +6,7 @@
     "kambi-widgets-cli": "./bin/cli.js"
   },
   "scripts": {
-    "postversion": "npm publish",
-    "jest": "jest"
+    "postversion": "npm publish"
   },
   "repository": {
     "type": "git",
