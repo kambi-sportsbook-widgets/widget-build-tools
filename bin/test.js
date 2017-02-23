@@ -23,9 +23,8 @@ const test = ({ options }) => {
       },
       rootDir: subjectPath,
       testRegex: '(./tests/.*|(\\.|/)(test|spec))\\.jsx?$',
-
       transform: {
-         ['\\.jsx?']: 'babel-jest'
+         ['\\.jsx?']: path.resolve(buildToolsPath, './jest/transform.js')
       },
       transformIgnorePatterns: [
          '/node_modules/(?!kambi-widget-core-library)(?!kambi-widget-components)' // transforms core-library and widget-components as well but ignores the rest of /node_modules/
