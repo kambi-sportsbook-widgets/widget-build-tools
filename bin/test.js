@@ -45,14 +45,6 @@ const test = ({ options }) => {
       jestParams.splice(jestParams.indexOf('--debug'), 1);
    }
 
-   const coverage = jestParams.indexOf('--coverage') !== -1;
-
-   if (coverage) {
-      jestParams.splice(jestParams.indexOf('--coverage'), 1);
-      jestParams.push('--coverage');
-      jestParams.push(path.resolve(subjectPath, 'coverage')); // coverage output folder
-   }
-
    jestParams.push('--colors');
    jestParams.push(`--config=${JSON.stringify(config)}`);
 
@@ -71,7 +63,7 @@ const test = ({ options }) => {
 
 test.config = {
    name: 'test',
-   description: 'Runs test suite. All options except --debug are passed to directly to jest. --coverage will output to ./coverage/ no path is required. Jest options can be found here: https://facebook.github.io/jest/docs/cli.html',
+   description: 'Runs test suite. All options except --debug are passed to directly to jest. Jest options can be found here: https://facebook.github.io/jest/docs/cli.html',
    options: [
       ['', 'debug', 'Runs the tests in debug mode. Requires Nodejs version 6.3 or higher. It is better to run this in conjuction with the watch mode. As of Nodejs version 7.6 breakpoints and debugger statements are ignored. This is a bug in Nodejs']
    ]
