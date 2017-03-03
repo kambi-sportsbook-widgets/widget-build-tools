@@ -85,10 +85,6 @@ const start = (opt) => {
          const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
          const devServer = new WebpackDevServer(compiler, {
             hot: true,
-            debug: true,
-            'output-pathinfo': true,
-            inline: true,
-            watch: true,
             watchOptions: {
                ignored: /node_modules/
             },

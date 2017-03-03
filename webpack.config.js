@@ -63,8 +63,7 @@ if (process.env.NODE_ENV === 'production') {
    ];
 
    plugins = plugins.concat([
-      new webpack.optimize.CommonsChunkPlugin('common.js'),
-      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.CommonsChunkPlugin({name: 'common'}),
       new webpack.optimize.UglifyJsPlugin({
          compress: {
             screw_ie8: true,
@@ -166,20 +165,14 @@ module.exports = {
          },
          {
             test: /\.html$/,
-            exclude: /node_modules/,
-            use: {
-               loader: 'file-loader',
-               /*options: {
-                name: '[name].[ext]'
-                }*/
-            },
-         },
+            use: 'html-loader'
+         }
       ]
    },
    resolveLoader: {
       symlinks: true,
       alias: {
-         'widget-api-webpack-loader': path.resolve(process.cwd(), 'node_modules', 'kambi-widget-build-tools', 'widget-api-webpack-loader')
+         'widget-api-webpack-loader': path.resolve(__dirname, 'widget-api-webpack-loader')
       }
    },
    output: {
