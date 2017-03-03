@@ -31,35 +31,35 @@ const test = ({ options }) => {
       ]
    };
 
-   const jestParams = ['--colors'];
    const nodeParams = [];
+   const jestParams = options.jestopts.split(' ');
 
-   if (options.updateSnapshot) {
-      jestParams.push('-u');
-   }
+   const debug = jestParams.indexOf('--debug') !== -1;
 
-   if (options.verbose) {
-      jestParams.push('--verbose');
-   }
-
-   if (options.coverage) {
-      jestParams.push('--coverage');
-      config.coverageDirectory = path.resolve(subjectPath, 'coverage');
-   }
-
-   if (options.watch) {
-      jestParams.push('--watch');
-   }
-
-   if (options.debug) {
+   if (debug) {
       // Breakpoints are currently not working (tested on nodejs 7.6)
       // see https://github.com/facebook/jest/issues/1652
       jestParams.push('--runInBand'); // makes the tests run serially instead of in parallel
       nodeParams.push('--inspect');
       nodeParams.push('--debug-brk');
+      jestParams.splice(jestParams.indexOf('--debug'), 1);
    }
 
+   const coverage = jestParams.indexOf('--coverage') !== -1;
+
+   if (coverage) {
+      jestParams.splice(jestParams.indexOf('--coverage'), 1);
+      jestParams.push('--coverage');
+      jestParams.push(path.resolve(subjectPath, 'coverage')); // coverage output folder
+   }
+
+   jestParams.push('--colors');
    jestParams.push(`--config=${JSON.stringify(config)}`);
+
+
+   // opts =  [ 'run', 'jest', '--', '--colors', '--watch' ]
+   // opts.push(`--config=${JSON.stringify(config)}`)
+   // return exec('npm',)
 
    return exec('node',
       nodeParams
@@ -71,13 +71,9 @@ const test = ({ options }) => {
 
 test.config = {
    name: 'test',
-   description: 'Runs test suite',
+   description: 'Runs test suite. All options except --debug are passed to directly to jest. --coverage will output to ./coverage/ no path is required. Jest options can be found here: https://facebook.github.io/jest/docs/cli.html',
    options: [
-      ['', 'coverage', 'Indicates that test coverage information should be collected and reported in the output.'],
-      ['u', 'updateSnapshot', 'Use this flag to re-record snapshots.'],
-      ['', 'verbose', 'Display individual test results with the test suite hierarchy'],
-      ['w', 'watch', 'Watchs for changes to files and re-run the tests'],
-      ['d', 'debug', 'Runs the tests in debug mode. Requires Nodejs version 6.3 or higher. It is better to run this in conjuction with the watch mode. As of Nodejs version 7.6 breakpoints and debugger statements are ignored. This is a bug in Nodejs']
+      ['', 'debug', 'Runs the tests in debug mode. Requires Nodejs version 6.3 or higher. It is better to run this in conjuction with the watch mode. As of Nodejs version 7.6 breakpoints and debugger statements are ignored. This is a bug in Nodejs']
    ]
 };
 

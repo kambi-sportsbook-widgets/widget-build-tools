@@ -64,12 +64,22 @@ if (!action) {
    process.exit(1);
 }
 
-// set up options parser
-const opt = getopt.create(action.config.options || [])
-   .parseSystem();
+let parsedOptions;
+if (action.name === 'test') {
+   // we pass the options for tests directly to jest
+   parsedOptions = {
+      options: {
+         jestopts: process.argv.slice(3).join(' ')
+      }
+   };
+} else {
+   // set up options parser
+   parsedOptions = getopt.create(action.config.options || [])
+      .parseSystem();
+}
 
 // run action
-action(opt)
+action(parsedOptions)
    .then(
       () => process.exit(0),
       (error) => {
