@@ -8,6 +8,7 @@ const childProcess = require('child_process');
  * @returns {Promise}
  */
 const exec = (cmd, params, options) => {
+   options = options == null ? {} : options;
    return new Promise((resolve, reject) => {
       console.log(`> ${cmd} ${params.join(' ')}`);
 
