@@ -19,7 +19,7 @@ const test = ({ options }) => {
          path.resolve(buildToolsPath, 'node_modules')
       ],
       moduleNameMapper: {
-         [ '\\.(s?css|less)$' ]: "identity-obj-proxy"
+         [ '\\.(s?css|less|jpe?g|png)$' ]: "identity-obj-proxy"
       },
       rootDir: subjectPath,
       testRegex: '(./tests/.*|(\\.|/)(test|spec))\\.jsx?$',
