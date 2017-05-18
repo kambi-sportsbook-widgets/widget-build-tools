@@ -1,6 +1,6 @@
 {
   "name": "kambi-widget-build-tools",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "description": "Build tools shared between the widgets",
   "bin": {
     "kambi-widgets-cli": "./bin/cli.js"
