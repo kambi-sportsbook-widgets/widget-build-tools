@@ -158,7 +158,10 @@ module.exports = validate({
             test: /\.jsx$/,
             loader: 'babel-loader',
             query: {
-               presets: [require.resolve('babel-preset-es2015'), require.resolve('babel-preset-react')]
+               presets: [require.resolve('babel-preset-es2015'), require.resolve('babel-preset-react')],
+               plugins: process.env.NODE_ENV === 'production'
+                  ? [require.resolve('babel-plugin-transform-react-remove-prop-types')]
+                  : []
             }
          },
          {
