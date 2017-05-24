@@ -98,6 +98,10 @@ module.exports = {
          {
             from: './src/mockSetupData.json',
             to: '.'
+         },
+         {
+            from: './src/assets',
+            to: 'assets'
          }
       ])
    ]
