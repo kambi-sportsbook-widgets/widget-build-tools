@@ -12,6 +12,20 @@ module.exports = {
    entry: {
       app: './src/index.js'
    },
+   module: {
+      rules: [
+         {
+            test: /\.jsx$/,
+            use: {
+               loader: 'babel-loader',
+               options: {
+                  presets: ['babel-preset-es2015', 'babel-preset-react'],
+                  plugins: ['babel-plugin-transform-react-remove-prop-types']
+               }
+            },
+         }
+      ]
+   },
    plugins: [
       new webpack.optimize.CommonsChunkPlugin({
          name: 'common'
