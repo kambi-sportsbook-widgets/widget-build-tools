@@ -74,6 +74,6 @@ EventWidget.propTypes = {
 
    title: React.PropTypes.string.isRequired
 
-}
+};
 
 export default EventWidget;

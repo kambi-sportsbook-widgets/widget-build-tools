@@ -27,7 +27,9 @@ const init = function(opt) {
       'sv_SE.json': 'src/i18n/',
       'EventWidget.jsx': 'src/js/Components/',
       'BetOffers.jsx': 'src/js/Components/',
+      'BetOffers.scss': 'src/js/Components/',
       'Participants.jsx': 'src/js/Components/',
+      'Participants.scss': 'src/js/Components/',
       'mockSetupData.json': 'src/',
       'package.json': '',
       'README.md': ''
@@ -72,21 +74,21 @@ const init = function(opt) {
 
       // set the build-tools and core-library versions to the newest versions in package.json
       .then(() => {
-         const p1 = exec('npm', [ 'show', 'kambi-widget-build-tools', 'version' ]);
-         const p2 = exec('npm', [ 'show', 'kambi-widget-core-library', 'version' ]);
-         const p3 = exec('npm', [ 'show', 'kambi-widget-components', 'version' ]);
-         const p4 = fs.readFileAsync(path.join(projectName, 'package.json'));
-         return Promise.all([p1, p2, p3, p4]).then((data) => {
-            // removing \n at the end of the versions
-            const buildToolsVersion = data[0].replace('\n', '');
-            const coreLibraryVersion = data[1].replace('\n', '');
-            const componentsVersion = data[2].replace('\n', '');
-            const packageJson = JSON.parse(data[3]);
-            packageJson.devDependencies['kambi-widget-build-tools'] = '^' + buildToolsVersion;
-            packageJson.dependencies['kambi-widget-core-library'] = '^' + coreLibraryVersion;
-            packageJson.dependencies['kambi-widget-components'] = '^' + componentsVersion;
-            return fs.writeFileAsync(path.join(projectName, 'package.json'), JSON.stringify(packageJson, null, 3));
-         })
+         return Promise.all([
+               exec('npm', [ 'show', 'kambi-widget-build-tools', 'version' ], {}, false),
+               exec('npm', [ 'show', 'kambi-widget-core-library', 'version' ], {}, false),
+               exec('npm', [ 'show', 'kambi-widget-components', 'version' ], {}, false),
+               fs.readFileAsync(path.join(projectName, 'package.json'))
+            ])
+            .then(([buildToolsVersion, coreLibraryVersion, componentsVersion, packageJson]) => {
+               packageJson = JSON.parse(packageJson);
+
+               packageJson.devDependencies['kambi-widget-build-tools'] = '^' + buildToolsVersion.replace('\n', '');
+               packageJson.dependencies['kambi-widget-core-library'] = '^' + coreLibraryVersion.replace('\n', '');
+               packageJson.dependencies['kambi-widget-components'] = '^' + componentsVersion.replace('\n', '');
+
+               return fs.writeFileAsync(path.join(projectName, 'package.json'), JSON.stringify(packageJson, null, 3));
+            });
       })
 
       // run npm install

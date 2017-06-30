@@ -1,6 +1,48 @@
-@import '~compass-mixins';
-@import '~kambi-widget-core-library/src/scss/core.scss';
+:global {
+   @import '~compass-mixins';
+   @import '~kambi-widget-core-library/src/scss/core.scss';
 
-.kw-header {
-   height: 37px;
+   .kw-body {
+      display: flex;
+      flex-direction: column;
+   }
+
+   .kw-header {
+      height: 37px;
+      padding-left: 12px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+   }
+
+   .kw-main {
+      display: flex;
+      flex-direction: column;
+   }
+
+   .kw-match {
+      display: flex;
+      margin: 8px;
+      justify-content: center;
+   }
+
+   .kw-participants {
+      display: flex;
+      margin: 8px;
+      align-items: center;
+      flex-direction: row;
+   }
+
+   .kw-participants__home {
+      display: flex;
+      margin: 8px;
+      flex: 1;
+   }
+
+   .kw-participants__away {
+      display: flex;
+      margin: 8px;
+      flex: 1;
+      justify-content: flex-end;
+   }
 }

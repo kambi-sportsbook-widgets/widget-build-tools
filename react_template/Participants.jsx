@@ -1,11 +1,12 @@
 import React from 'react';
+import styles from './Participants.scss';
 
 const Participants = ( { homeName, awayName, onClick } ) => {
    return (
-      <div className='participants'onClick={onClick}>
-         <span className='participants-font-size'> {homeName} </span>
-         <span className='participants-font-size'> - </span>
-         <span className='participants-font-size'> {awayName} </span>
+      <div className={styles.participants} onClick={onClick}>
+         <span className={styles['participants-font-size']}> {homeName} </span>
+         <span className={styles['participants-font-size']}> - </span>
+         <span className={styles['participants-font-size']}> {awayName} </span>
       </div>
    );
 };
