@@ -92,7 +92,8 @@ const start = (opt) => {
             quiet: false,
             stats: {
                colors: true
-            }
+            },
+            disableHostCheck: true,
          });
 
          devServer.use(devServer.middleware);
