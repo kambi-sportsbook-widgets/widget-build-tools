@@ -83,18 +83,8 @@ const start = (opt) => {
    return copyConfigFiles()
       .then(() => {
          const compiler = webpack(require('../webpack.config.js')); // eslint-disable-line
-         const devServer = new WebpackDevServer(compiler, {
-            hot: true,
-            watchOptions: {
-               ignored: /node_modules/
-            },
-            https: true,
-            quiet: false,
-            stats: {
-               colors: true
-            },
-            disableHostCheck: true,
-         });
+
+         const devServer = new WebpackDevServer(compiler, compiler.options.devServer);
 
          devServer.use(devServer.middleware);
 
@@ -105,11 +95,6 @@ const start = (opt) => {
                   reject(err);
                   return;
                }
-
-               console.log('The app is running at:');
-               console.log('  ' + chalk.cyan('https://localhost:' + port + '/'));
-               console.log('');
-
                // resolve(); if we resolve the server closes
             });
          });
