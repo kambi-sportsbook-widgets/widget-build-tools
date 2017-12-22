@@ -32,7 +32,7 @@ let devServer = {
       hash: false
    },
    useLocalIp: true,
-   after: function() {
+   after: function () {
       const protocol = this.https ? 'https://' : 'http://'
 
       const localHost = `Locally: ${chalk.cyan(protocol + this.host + ':' + this.port + '/')}`
@@ -53,40 +53,7 @@ if (useHttps) {
 }
 
 module.exports = {
-   devtool: 'source-map',
-   entry: './src/index.js',
    devServer,
-   module: {
-      rules: [
-         {
-            test: /\.scss$/,
-            use: [
-               {
-                  loader: 'css-loader',
-                  options: {
-                     sourceMap: true,
-                     localIdentName: '[name]__[local]___[hash:base64:5]'
-                  }
-               },
-               {
-                  loader: 'postcss-loader',
-                  options: {
-                     sourceMap: true
-                  }
-               },
-               {
-                  loader: 'sass-loader',
-                  options: {
-                     sourceMap: true
-                  }
-               }
-            ]
-         }
-      ]
-   },
-   plugins: [
-      new webpack.HotModuleReplacementPlugin()
-   ],
    resolve: Object.assign(
       {},
       useRealReact
