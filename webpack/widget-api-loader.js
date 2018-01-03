@@ -14,7 +14,7 @@ try {
 module.exports = function (source) {
    this.cacheable(true);
    return source.replace(
-      '<head>',
-      `<head>\\n<script src=\\"common.js\\"></script>\\n<script src=\\"polyfills.js\\"></script><script src=\\"https://c3-static.kambi.com/sb-mobileclient/widget-api/${widgetApiVersion}/kambi-widget-api.js\\"></script>`
+      '</body>',
+      `\\n<script src=\\"polyfills.js\\"></script><script src=\\"https://c3-static.kambi.com/sb-mobileclient/widget-api/${widgetApiVersion}/kambi-widget-api.js\\" async></script>\\n</body>`
    );
 };

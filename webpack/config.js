@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin')
 const path = require('path');
 
 
@@ -17,7 +18,14 @@ module.exports = env => {
       }),
       new HtmlWebpackPlugin({
          template: 'src/index.html',
-         chunks: ['main']
+         minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+         },
+      }),
+      new ScriptExtHtmlWebpackPlugin({
+         defaultAttribute: 'async',
+         sync: 'polyfills.js'
       }),
       new CopyWebpackPlugin([
          {
@@ -41,9 +49,9 @@ module.exports = env => {
 
    if (isProd) {
       plugins = [...plugins,
-      new webpack.optimize.CommonsChunkPlugin({
-         name: 'common'
-      }),
+      // new webpack.optimize.CommonsChunkPlugin({
+      //    name: 'common'
+      // }),
       new webpack.optimize.UglifyJsPlugin({
          compress: {
             screw_ie8: true,
