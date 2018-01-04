@@ -18,6 +18,7 @@ module.exports = env => {
       }),
       new HtmlWebpackPlugin({
          template: 'src/index.html',
+         excludeChunks: ['polyfills'],
          minify: {
             removeComments: true,
             collapseWhitespace: true,
@@ -49,9 +50,6 @@ module.exports = env => {
 
    if (isProd) {
       plugins = [...plugins,
-      // new webpack.optimize.CommonsChunkPlugin({
-      //    name: 'common'
-      // }),
       new webpack.optimize.UglifyJsPlugin({
          compress: {
             screw_ie8: true,
