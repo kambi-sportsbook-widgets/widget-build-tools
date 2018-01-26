@@ -158,12 +158,6 @@ module.exports = env => {
             path.resolve(process.cwd(), 'node_modules')
          ]
       },
-      resolveLoader: {
-         symlinks: true,
-         alias: {
-            'widget-api-loader': path.resolve(__dirname, 'widget-api-loader')
-         }
-      },
       plugins
    }
 };
