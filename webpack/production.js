@@ -1,10 +1,9 @@
-const webpack = require('webpack')
-const path = require('path');
-
+const webpack = require("webpack");
+const path = require("path");
 
 const useRealReact = Object.assign(
    { production: false },
-   require(path.resolve(process.cwd(), 'package.json')).useRealReact || {}
+   require(path.resolve(process.cwd(), "package.json")).useRealReact || {}
 ).production;
 
 module.exports = {
@@ -13,10 +12,10 @@ module.exports = {
       useRealReact
          ? {}
          : {
-            alias: {
-               'react': 'react-lite',
-               'react-dom': 'react-lite'
-            }
-         }
+              alias: {
+                 react: "preact-compat",
+                 "react-dom": "preact-compat"
+              }
+           }
    )
 };
