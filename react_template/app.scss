@@ -1,15 +1,15 @@
 :global {
-   @import '~compass-mixins';
-   @import '~kambi-widget-core-library/src/scss/core.scss';
+  @import '~compass-mixins';
+  @import '~kambi-widget-core-library/src/scss/core.scss';
 
-   // Our webpack configuration uses autoprefixer (https://github.com/postcss/autoprefixer) so we don't need to worry about vendor specific prefixes
+  // Our webpack configuration uses autoprefixer (https://github.com/postcss/autoprefixer) so we don't need to worry about vendor specific prefixes
 
-   .participants {
-      text-align: center;
-      cursor: pointer;
-   }
+  .participants {
+    text-align: center;
+    cursor: pointer;
+  }
 
-   .participants-font-size {
-      font-size: large;
-   }
+  .participants-font-size {
+    font-size: large;
+  }
 }

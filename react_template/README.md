@@ -4,13 +4,11 @@ ${projectDescription}
 
 ## Configuration example:
 
-__`client-widgets.js`__
+**`client-widgets.js`**
 
 ```json
-
 ...
 {
 },
 ...
-
 ```

@@ -1,4 +1,4 @@
-const childProcess = require('child_process');
+const childProcess = require('child_process')
 
 /**
  * Executes given command. Prints results to stdout/stderr.
@@ -9,39 +9,39 @@ const childProcess = require('child_process');
  * @returns {Promise}
  */
 const exec = (cmd, params, options, inheritStdio) => {
-   options = options == null ? {} : options;
-   inheritStdio = inheritStdio == null ? true : inheritStdio;
-   return new Promise((resolve, reject) => {
-      console.log(`> ${cmd} ${params.join(' ')}`);
+  options = options == null ? {} : options
+  inheritStdio = inheritStdio == null ? true : inheritStdio
+  return new Promise((resolve, reject) => {
+    console.log(`> ${cmd} ${params.join(' ')}`)
 
-      if (inheritStdio === true) {
-         options.stdio = 'inherit';
+    if (inheritStdio === true) {
+      options.stdio = 'inherit'
+    }
+    const child = childProcess.spawn(cmd, params, options)
+
+    let stdout = ''
+    let stderr = ''
+    if (inheritStdio === false) {
+      child.stdout.on('data', data => (stdout += data))
+      child.stderr.on('data', data => (stderr += data))
+    }
+
+    child.on('close', code => {
+      if (code == 0) {
+        if (inheritStdio === true) {
+          resolve()
+        } else {
+          resolve(stdout)
+        }
+      } else {
+        if (inheritStdio === true) {
+          reject(new Error(`Process exited with code ${code}\n`))
+        } else {
+          reject(stderr)
+        }
       }
-      const child = childProcess.spawn(cmd, params, options);
+    })
+  })
+}
 
-      let stdout = '';
-      let stderr = '';
-      if (inheritStdio === false) {
-         child.stdout.on('data', (data) => stdout += data);
-         child.stderr.on('data', (data) => stderr += data);
-      }
-
-      child.on('close', (code) => {
-         if (code == 0) {
-            if (inheritStdio === true) {
-               resolve();
-            } else {
-               resolve(stdout);
-            }
-         } else {
-            if (inheritStdio === true) {
-               reject(new Error(`Process exited with code ${code}\n`));
-            } else {
-               reject(stderr);
-            }
-         }
-      });
-   });
-};
-
-module.exports = exec;
+module.exports = exec
