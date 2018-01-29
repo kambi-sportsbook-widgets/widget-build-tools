@@ -1,6 +1,6 @@
 {
   "name": "kambi-widget-build-tools",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "description": "Build tools shared between the widgets",
   "bin": {
     "kambi-widgets-cli": "./bin/cli.js"
@@ -17,20 +17,20 @@
     "trailingComma": "es5"
   },
   "lint-staged": {
-    "*.{js,json,css}": ["prettier --write", "git add"]
+    "*.{js,json,css}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
-    "url":
-      "git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git"
+    "url": "git+ssh://git@github.com:kambi-sportsbook-widgets/widget-build-tools.git"
   },
   "license": "MIT",
   "bugs": {
-    "url":
-      "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
+    "url": "https://github.com/kambi-sportsbook-widgets/widget-build-tools/issues"
   },
-  "homepage":
-    "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme",
+  "homepage": "https://github.com/kambi-sportsbook-widgets/widget-build-tools#readme",
   "dependencies": {
     "autoprefixer": "^6.5.3",
     "babel-core": "^6.21.0",
