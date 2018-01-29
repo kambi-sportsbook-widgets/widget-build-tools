@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const ScriptExtHtmlWebpackPlugin = require("script-ext-html-webpack-plugin");
+const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 const path = require("path");
 
 module.exports = env => {
@@ -16,21 +16,13 @@ module.exports = env => {
       }),
       new HtmlWebpackPlugin({
          template: "src/index.html",
-         excludeChunks: ["polyfills"],
-         minify: {
-            removeComments: true,
-            collapseWhitespace: true
-         }
-      }),
-      new ScriptExtHtmlWebpackPlugin({
-         defaultAttribute: "async",
-         sync: "polyfills.js"
+         //  minify: {
+         //     removeComments: true,
+         //     collapseWhitespace: true
+         //  },
+         inject: "head"
       }),
       new CopyWebpackPlugin([
-         {
-            from: "./src/i18n",
-            to: "i18n"
-         },
          {
             from: "./src/mockSetupData.json",
             to: "."
@@ -41,10 +33,6 @@ module.exports = env => {
          }
       ])
    ];
-
-   if (isDev) {
-      plugins = [...plugins, new webpack.HotModuleReplacementPlugin()];
-   }
 
    if (isProd) {
       plugins = [
@@ -69,8 +57,7 @@ module.exports = env => {
 
    return {
       entry: {
-         main: "./src/index.js",
-         polyfills: path.join(__dirname, "polyfills.js")
+         main: "./src/index.js"
       },
       ...(isDev && { devtool: "source-map" }),
       module: {
@@ -102,21 +89,14 @@ module.exports = env => {
                ]
             },
             {
-               test: /\.js$/,
+               test: /src(\/|\\)index\.js/,
+               exclude: [path.resolve(process.cwd(), "/node_modules/")],
                use: {
-                  loader: "babel-loader",
-                  options: {
-                     presets: ["babel-preset-es2015"],
-                     ...(isProd && {
-                        plugins: [
-                           "babel-plugin-transform-react-remove-prop-types"
-                        ]
-                     })
-                  }
+                  loader: "translations-loader"
                }
             },
             {
-               test: /\.jsx$/,
+               test: /(\.js|\.jsx)$/,
                use: {
                   loader: "babel-loader",
                   options: {
@@ -149,6 +129,15 @@ module.exports = env => {
             path.resolve(__dirname, "node_modules"),
             path.resolve(process.cwd(), "node_modules")
          ]
+      },
+      resolveLoader: {
+         symlinks: true,
+         alias: {
+            "translations-loader": path.resolve(
+               __dirname,
+               "translations-loader"
+            )
+         }
       },
       plugins
    };

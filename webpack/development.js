@@ -1,15 +1,14 @@
-const webpack = require('webpack');
-const path = require('path');
-const chalk = require('chalk')
+const webpack = require("webpack");
+const path = require("path");
+const chalk = require("chalk");
 
-const getLocalIp = require('../bin/localIp').getLocalIp
+const getLocalIp = require("../bin/localIp").getLocalIp;
 
-const pkg = require(path.resolve(process.cwd(), 'package.json'))
+const pkg = require(path.resolve(process.cwd(), "package.json"));
 
-const useHttps = Object.assign(
-   pkg,
-   { useHttps: pkg.useHttps == true ? true : false }
-).useHttps;
+const useHttps = Object.assign(pkg, {
+   useHttps: pkg.useHttps == true ? true : false
+}).useHttps;
 
 const useRealReact = Object.assign(
    { development: true },
@@ -17,11 +16,11 @@ const useRealReact = Object.assign(
 ).development;
 
 let devServer = {
-   contentBase: path.join(__dirname, 'dist'),
+   contentBase: path.join(__dirname, "dist"),
    port: 8080,
    inline: true,
    hot: true,
-   host: 'localhost',
+   host: "localhost",
    stats: {
       colors: true,
       errors: true,
@@ -32,11 +31,15 @@ let devServer = {
       hash: false
    },
    useLocalIp: true,
-   after: function () {
-      const protocol = this.https ? 'https://' : 'http://'
+   after: function() {
+      const protocol = this.https ? "https://" : "http://";
 
-      const localHost = `Locally: ${chalk.cyan(protocol + this.host + ':' + this.port + '/')}`
-      const localIp = `Local IP: ${chalk.cyan(protocol + getLocalIp() + ':' + this.port + '/')}`
+      const localHost = `Locally: ${chalk.cyan(
+         protocol + this.host + ":" + this.port + "/"
+      )}`;
+      const localIp = `Local IP: ${chalk.cyan(
+         protocol + getLocalIp() + ":" + this.port + "/"
+      )}`;
 
       console.log(`
       The app is running at:
@@ -45,24 +48,13 @@ let devServer = {
       ${localIp}
       `);
    }
-}
+};
 
 if (useHttps) {
-   console.log('Using self signed certificates over https');
-   devServer['https'] = useHttps
+   console.log("Using self signed certificates over https");
+   devServer["https"] = useHttps;
 }
 
 module.exports = {
-   devServer,
-   resolve: Object.assign(
-      {},
-      useRealReact
-         ? {}
-         : {
-            alias: {
-               'react': 'react-lite',
-               'react-dom': 'react-lite'
-            }
-         }
-   )
+   devServer
 };
