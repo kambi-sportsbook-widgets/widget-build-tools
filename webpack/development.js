@@ -10,11 +10,6 @@ const useHttps = Object.assign(pkg, {
   useHttps: pkg.useHttps == true ? true : false,
 }).useHttps
 
-const useRealReact = Object.assign(
-  { development: true },
-  pkg.useRealReact || {}
-).development
-
 let devServer = {
   contentBase: path.join(__dirname, 'dist'),
   port: 8080,

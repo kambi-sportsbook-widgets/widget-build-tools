@@ -1,7 +1,6 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 const path = require('path')
 
 module.exports = env => {
@@ -16,10 +15,10 @@ module.exports = env => {
     }),
     new HtmlWebpackPlugin({
       template: 'src/index.html',
-      //  minify: {
-      //     removeComments: true,
-      //     collapseWhitespace: true
-      //  },
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+      },
       inject: 'head',
     }),
     new CopyWebpackPlugin([
