@@ -12,13 +12,19 @@ module.exports = function(source) {
   translationFiles.forEach(fullFileName => {
     const [fileName, fileExtension] = fullFileName.split('.')
     if (fileExtension === 'json') {
-      const fileContent = fs.readFileSync(
-        path.resolve(i18nFolderPath, fullFileName),
-        {
-          encoding: 'utf8',
-        }
-      )
-      kambiI18n[fileName] = JSON.parse(fileContent)
+      try {
+        const fileContent = fs.readFileSync(
+          path.resolve(i18nFolderPath, fullFileName),
+          {
+            encoding: 'utf8',
+          }
+        )
+        kambiI18n[fileName] = JSON.parse(fileContent)
+      } catch (e) {
+        throw new Error(`Problems reading i18n file:${fileName}
+        Error:
+        ${e.message}`)
+      }
     } else {
       console.warn(
         `Invalid extension for i18n file ${fileName}, needs to be JSON`
