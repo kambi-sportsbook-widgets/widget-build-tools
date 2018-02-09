@@ -1,6 +1,8 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
 const path = require('path')
 
 module.exports = env => {
@@ -51,6 +53,10 @@ module.exports = env => {
         },
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: false,
+      }),
     ]
   }
 
@@ -62,57 +68,83 @@ module.exports = env => {
     module: {
       rules: [
         {
-          test: /\.scss$/,
-          use: [
+          oneOf: [
+            // oneOf makes sure only one loader runs
             {
-              loader: 'style-loader',
+              test: /\.scss$/,
+              use: [
+                {
+                  loader: 'style-loader',
+                },
+                {
+                  loader: 'css-loader',
+                  options: {
+                    modules: true,
+                    ...(isDev && {
+                      sourceMap: true,
+                      localIdentName: '[name]__[local]___[hash:base64:5]',
+                    }),
+                  },
+                },
+                {
+                  loader: 'postcss-loader',
+                  ...(isDev && { options: { sourceMap: true } }),
+                },
+                {
+                  loader: 'sass-loader',
+                  ...(isDev && { options: { sourceMap: true } }),
+                },
+              ],
             },
             {
-              loader: 'css-loader',
-              options: {
-                modules: true,
-                ...(isDev && {
-                  sourceMap: true,
-                  localIdentName: '[name]__[local]___[hash:base64:5]',
-                }),
+              test: /src(\/|\\)index\.js/,
+              exclude: [path.resolve(process.cwd(), '/node_modules/')],
+              use: {
+                loader: 'translations-loader',
               },
             },
             {
-              loader: 'postcss-loader',
-              ...(isDev && { options: { sourceMap: true } }),
+              test: /(\.js|\.jsx)$/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: [
+                    [
+                      require('babel-preset-env'),
+                      {
+                        targets: {
+                          browsers: ['last 2 versions', 'ie >= 11'],
+                        },
+                        useBuiltIns: false, // polyfills are done manually in the core-library
+                      },
+                    ],
+                    require('babel-preset-react'),
+                  ],
+                  plugins: isProd
+                    ? [
+                        require('babel-plugin-transform-react-remove-prop-types')
+                          .default,
+                      ]
+                    : [],
+                },
+              },
             },
             {
-              loader: 'sass-loader',
-              ...(isDev && { options: { sourceMap: true } }),
+              test: /(\.png|\.jpe?g)$/,
+              use: 'url-loader',
+            },
+            {
+              test: /\.html$/,
+              use: 'html-loader',
+            },
+            {
+              // if no other loader matches, it will fallback to this loader
+              loader: require.resolve('file-loader'),
+              options: {
+                name: 'assets/media/[name].[hash:8].[ext]',
+              },
             },
           ],
-        },
-        {
-          test: /src(\/|\\)index\.js/,
-          exclude: [path.resolve(process.cwd(), '/node_modules/')],
-          use: {
-            loader: 'translations-loader',
-          },
-        },
-        {
-          test: /(\.js|\.jsx)$/,
-          use: {
-            loader: 'babel-loader',
-            options: {
-              presets: ['babel-preset-es2015', 'babel-preset-react'],
-              ...(isProd && {
-                plugins: ['babel-plugin-transform-react-remove-prop-types'],
-              }),
-            },
-          },
-        },
-        {
-          test: /(\.png|\.jpe?g)$/,
-          use: 'url-loader',
-        },
-        {
-          test: /\.html$/,
-          use: 'html-loader',
         },
       ],
     },

@@ -27,15 +27,6 @@ const copyConfigFiles = () => {
 
   // files with special handling
 
-  // LICENSE file, we don't copy it if it is already there
-  let filePath = path.join(configFolder, 'LICENSE')
-  if (fs.existsSync(filePath)) {
-    const fileDest = path.join(process.cwd(), 'LICENSE')
-    if (!fs.existsSync(fileDest)) {
-      fs.copySync(filePath, fileDest)
-    }
-  }
-
   // gitignore, we need to rename it to .gitignore (npm strips .gitignore)
   filePath = path.join(configFolder, 'gitignore')
   if (fs.existsSync(filePath)) {
@@ -139,8 +130,10 @@ const build = () => {
             )
             return
           }
-
-          resolve(compiler)
+          setTimeout(() => {
+            // gives some time for webpack-bundle-analyzer to process the report.html
+            resolve(compiler)
+          }, 3000)
         })
       })
     })
