@@ -9,6 +9,16 @@ module.exports = env => {
   const isDev = env === 'development'
   const isProd = env === 'production'
 
+  const babelLoader = {
+    loader: 'babel-loader',
+    options: {
+      presets: require('./babel-presets'),
+      plugins: isProd
+        ? [require('babel-plugin-transform-react-remove-prop-types').default]
+        : [],
+    },
+  }
+
   let plugins = [
     new webpack.DefinePlugin({
       'process.env': {
@@ -99,24 +109,16 @@ module.exports = env => {
             {
               test: /src(\/|\\)index\.js/,
               exclude: [path.resolve(process.cwd(), '/node_modules/')],
-              use: {
-                loader: 'translations-loader',
-              },
+              use: [
+                {
+                  loader: 'translations-loader',
+                },
+                babelLoader,
+              ],
             },
             {
               test: /(\.js|\.jsx)$/,
-              use: {
-                loader: 'babel-loader',
-                options: {
-                  presets: require('./babel-presets'),
-                  plugins: isProd
-                    ? [
-                        require('babel-plugin-transform-react-remove-prop-types')
-                          .default,
-                      ]
-                    : [],
-                },
-              },
+              use: babelLoader,
             },
             {
               test: /(\.png|\.jpe?g)$/,
