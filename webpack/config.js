@@ -1,6 +1,7 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin
 const path = require('path')
@@ -38,18 +39,12 @@ module.exports = env => {
   if (isProd) {
     plugins = [
       ...plugins,
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          screw_ie8: true,
-          warnings: false,
-          drop_console: true, // Kambi informed us they want the widgets to fail silently in production
-        },
-        mangle: {
-          screw_ie8: true,
-        },
-        output: {
-          comments: false,
-          screw_ie8: true,
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          ie8: false,
+          compress: {
+            drop_console: true, // Kambi informed us they want the widgets to fail silently in production
+          },
         },
       }),
       new webpack.optimize.AggressiveMergingPlugin(),
