@@ -14,9 +14,14 @@ module.exports = env => {
     loader: 'babel-loader',
     options: {
       presets: require('./babel-presets'),
-      plugins: isProd
-        ? [require('babel-plugin-transform-react-remove-prop-types').default]
-        : [],
+      plugins: [
+        require('babel-plugin-transform-class-properties'),
+        require('babel-plugin-transform-object-rest-spread'),
+      ].concat(
+        isProd
+          ? [require('babel-plugin-transform-react-remove-prop-types').default]
+          : []
+      ),
     },
   }
 
