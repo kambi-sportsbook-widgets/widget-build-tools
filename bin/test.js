@@ -2,6 +2,8 @@ const chalk = require('chalk'),
   exec = require('./exec'),
   path = require('path')
 
+process.env.BABEL_ENV = 'test'
+process.env.NODE_ENV = 'test'
 /**
  * Deletes distribution folder recursively
  * @returns {Promise}
