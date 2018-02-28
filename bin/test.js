@@ -54,9 +54,13 @@ const test = ({ options }) => {
   // opts.push(`--config=${JSON.stringify(config)}`)
   // return exec('npm',)
 
+  const params = process.platform === "win32"?
+    nodeParams.concat(['./node_modules/jest/bin/jest.js']).concat(jestParams):
+    nodeParams.concat(['./node_modules/.bin/jest']).concat(jestParams)
+
   return exec(
     'node',
-    nodeParams.concat(['./node_modules/.bin/jest']).concat(jestParams),
+    params,
     { cwd: subjectPath }
   )
 }
