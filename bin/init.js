@@ -94,13 +94,13 @@ const init = function(opt) {
         const p1 = exec(
           'npm',
           ['show', 'kambi-widget-build-tools', 'version'],
-          {},
+          { shell: true },
           false
         )
         const p2 = exec(
           'npm',
           ['show', 'kambi-widget-core-library', 'version'],
-          {},
+          { shell: true },
           false
         )
         const p3 = fs.readFileAsync(path.join(projectName, 'package.json'))
@@ -128,6 +128,7 @@ const init = function(opt) {
 
         return exec('npm', ['install'], {
           cwd: path.join(process.cwd(), projectName),
+          shell: true,
         })
       })
   )
