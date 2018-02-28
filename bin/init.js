@@ -22,7 +22,7 @@ const init = function(opt) {
     )
   }
 
-  // map of what needs to be copied where
+  // map of what files need to be copied where
   const files = {
     'app.scss': 'src/',
     'index.html': 'src/',
@@ -31,6 +31,11 @@ const init = function(opt) {
     'package.json': '',
     'README.md': '',
   }
+
+  // map of what directories need to be created
+  const dirs = [
+    'src/assets',
+  ]
 
   // variables to replace across all files
   const vars = {
@@ -85,6 +90,15 @@ const init = function(opt) {
                   fileContent
                 )
               )
+          })
+        )
+      })
+
+      // create additional empty directories
+      .then(() => {
+        return Promise.all(
+          dirs.map(dir => {
+            return fs.mkdirpAsync(path.join(projectName, dir))
           })
         )
       })
