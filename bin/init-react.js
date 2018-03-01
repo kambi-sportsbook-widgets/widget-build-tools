@@ -105,19 +105,19 @@ const init = function(opt) {
           exec(
             'npm',
             ['show', 'kambi-widget-build-tools', 'version'],
-            {},
+            { shell: true },
             false
           ),
           exec(
             'npm',
             ['show', 'kambi-widget-core-library', 'version'],
-            {},
+            { shell: true },
             false
           ),
           exec(
             'npm',
             ['show', 'kambi-widget-components', 'version'],
-            {},
+            { shell: true },
             false
           ),
           fs.readFileAsync(path.join(projectName, 'package.json')),
@@ -153,6 +153,7 @@ const init = function(opt) {
 
         return exec('npm', ['install'], {
           cwd: path.join(process.cwd(), projectName),
+          shell: true
         })
       })
   )
