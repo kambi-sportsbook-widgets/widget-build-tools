@@ -39,6 +39,11 @@ const init = function(opt) {
     'README.md': '',
   }
 
+  // map of what directories need to be created
+  const dirs = [
+    'src/assets',
+  ]
+
   // variables to replace across all files
   const vars = {
     projectName: projectName,
@@ -95,6 +100,15 @@ const init = function(opt) {
                   fileContent
                 )
               )
+          })
+        )
+      })
+
+      // create additional empty directories
+      .then(() => {
+        return Promise.all(
+          dirs.map(dir => {
+            return fs.mkdirpAsync(path.join(projectName, dir))
           })
         )
       })
